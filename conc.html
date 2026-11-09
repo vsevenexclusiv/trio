@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --accent: #ff5f2e;
+    --accent-soft: rgba(255, 95, 46, 0.12);
+    --tab-bg: #fbe1cc;
+    --tab-text: #f57c00;
+    --card-bg: #ffffff;
+    --text: #0f172a;
+    --muted: #64748b;
+    --dim: #94a3b8;
+    --border: rgba(15,23,42,0.08);
+    --top-h: 60px;
+    --bottom-h: 84px;
+  }
+  
+  * { 
+    box-sizing: border-box; 
+    margin: 0; 
+    padding: 0; 
+    font-family: 'Montserrat', sans-serif;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  body {
+    background-color: #ffffff;
+    background-image: 
+      radial-gradient(circle at 10% 10%, rgba(255, 138, 61, 0.25) 0%, transparent 50%),
+      radial-gradient(circle at 90% 90%, rgba(255, 95, 46, 0.2) 0%, transparent 50%);
+    color: var(--text);
+    overflow: hidden;
+  }
+
+  /* ============ TOP BAR ============ */
+  .topbar {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 50;
+    padding: calc(env(safe-area-inset-top) + 12px) 16px 12px;
+    background: rgba(255, 255, 255, 0.85);
+    backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px);
+    border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .brand { display: flex; align-items: center; gap: 10px; }
+  .logo {
+    width: 36px; height: 36px; border-radius: 8px;
+    background: #fff; display: flex; align-items: center; justify-content: center; overflow: hidden;
+  }
+  .logo img { width: 100%; height: 100%; object-fit: cover; }
+  .brand b { font-size: 20px; font-weight: 900; letter-spacing: 0.5px; }
+  
+  .top-actions { display: flex; gap: 8px; }
+  .icon-btn {
+    width: 38px; height: 38px; border-radius: 12px;
+    display: flex; align-items: center; justify-content: center;
+    background: rgba(255,255,255,0.7); border: 1px solid var(--border); color: var(--text);
+  }
+  .icon-btn svg { width: 18px; height: 18px; }
+
+  /* ============ SCROLL AREA ============ */
+  #scroller {
+    position: fixed; inset: 0; overflow-y: auto; -webkit-overflow-scrolling: touch;
+    padding-top: calc(var(--top-h) + env(safe-area-inset-top) + 20px);
+    padding-bottom: calc(var(--bottom-h) + env(safe-area-inset-bottom) + 20px);
+  }
+  
+  .view { display: none; padding: 0 20px; max-width: 500px; margin: 0 auto; animation: fade .3s ease; }
+  .view.active { display: flex; flex-direction: column; align-items: center; }
+  @keyframes fade { from{opacity:0; transform:translateY(6px);} to{opacity:1; transform:none;} }
+
+  /* ============ HEADERS ============ */
+  .header-section { text-align: center; margin-bottom: 20px; width: 100%; }
+  .main-heading { font-size: 28px; font-weight: 900; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 8px; }
+  .date-heading { font-size: 18px; font-weight: 700; text-transform: uppercase; margin-bottom: 6px; }
+  .summary-heading { font-size: 13px; font-weight: 500; color: var(--muted); }
+
+  /* ============ TOP TABS (Buttons) ============ */
+  .top-tabs {
+    display: flex; width: 100%; max-width: 320px;
+    background: var(--tab-bg); border-radius: 99px;
+    padding: 4px; margin-bottom: 24px;
+  }
+  .top-tab {
+    flex: 1; padding: 10px 0; border: none; background: transparent;
+    font-size: 13px; font-weight: 800; color: var(--tab-text);
+    text-transform: uppercase; border-radius: 99px;
+    transition: all 0.2s ease; cursor: pointer;
+  }
+  .top-tab.active {
+    background: #fff; color: var(--tab-text);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  }
+
+  /* ============ SLIDER CONTAINER ============ */
+  .slider-container {
+    position: relative; width: 100%; max-width: 320px;
+    height: 380px; perspective: 1000px; margin-bottom: 30px;
+    touch-action: pan-y; /* Allows vertical scroll, captures horizontal swipe */
+  }
+
+  /* ============ CARDS ============ */
+  .card {
+    position: absolute; top: 0; left: 50%; width: 100%; height: 100%;
+    background: var(--card-bg); box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+    border: 1px solid rgba(0,0,0,0.04); padding: 24px;
+    transition: transform 0.4s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.4s ease, z-index 0s;
+    transform: translateX(-50%) scale(0.8);
+    opacity: 0; z-index: 1; pointer-events: none;
+    display: flex; flex-direction: column;
+  }
+  .card.active { transform: translateX(-50%) scale(1); opacity: 1; z-index: 3; pointer-events: auto; }
+  .card.prev { transform: translateX(-125%) scale(0.85); opacity: 0.5; z-index: 2; pointer-events: auto; cursor: pointer; }
+  .card.next { transform: translateX(25%) scale(0.85); opacity: 0.5; z-index: 2; pointer-events: auto; cursor: pointer; }
+
+  /* ============ CARD CONTENT ============ */
+  .card-title { font-size: 22px; font-weight: 800; margin-bottom: 20px; text-align: center; color: var(--accent); text-transform: uppercase; }
+  .card-content { flex: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; color: var(--muted); font-weight: 500; line-height: 1.5; }
+
+  /* ============ CONTROLS ROW ============ */
+  .controls-row {
+    width: 100%; max-width: 320px; display: flex; align-items: center; justify-content: space-between;
+    height: 30px; margin-bottom: 24px;
+  }
+  .chevron { display: flex; align-items: center; justify-content: center; width: 32px; height: 30px; color: var(--text); cursor: pointer; }
+  .chevron:active { transform: scale(0.85); }
+  .chevron svg { height: 30px; width: auto; }
+
+  .nav-dots { display: flex; align-items: center; gap: 6px; height: 30px; }
+  
+  /* Removed border radius */
+  .dot {
+    width: 7.5px; height: 15px; border-radius: 0;
+    background: rgba(15, 23, 42, 0.15); transition: all 0.3s cubic-bezier(0.25, 1, 0.5, 1); cursor: pointer;
+  }
+  .dot.active { height: 30px; background: var(--accent); }
+
+  /* ============ FOOTER ============ */
+  .footer-text { font-size: 12px; color: var(--muted); text-align: center; line-height: 1.6; font-weight: 500; }
+
+  /* ============ FLOATING BOTTOM NAV ============ */
+  .bottomnav {
+    position: fixed; bottom: calc(16px + env(safe-area-inset-bottom)); left: 16px; right: 16px; z-index: 50;
+    background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px);
+    border-radius: 32px; box-shadow: 0 8px 32px rgba(15,23,42,0.08); border: 1px solid rgba(255,255,255,0.8);
+    max-width: 500px; margin: 0 auto;
+  }
+  .bottomnav-inner { height: 68px; display: flex; justify-content: space-around; align-items: center; padding: 0 8px; }
+  .nav-item {
+    flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px;
+    padding: 8px 0; color: var(--dim); transition: all 0.2s ease; max-width: 80px; cursor: pointer;
+  }
+  .nav-item svg { width: 22px; height: 22px; stroke: currentColor; stroke-width: 2; fill: none; transition: transform 0.2s ease; }
+  .nav-item span { font-size: 10px; font-weight: 600; }
+  .nav-item.active { background: var(--accent-soft); color: var(--accent); border-radius: 20px; }
+  .nav-item.active svg { transform: scale(1.05); }
+  .nav-item.active span { font-weight: 700; }
+</style>
+</head>
+<body>
+
+<!-- TOP BAR -->
+<header class="topbar">
+  <div class="brand">
+    <span class="logo">
+      <img src="trio_logo.png" alt="Trio Logo" onerror="this.style.display='none'; this.parentElement.style.background='linear-gradient(150deg, #ff5f2e, #ff8a3d)';">
+    </span>
+    <b>TRIO</b>
+  </div>
+  <div class="top-actions">
+    <button class="icon-btn" onclick="alert('Info clicked')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+    </button>
+    <button class="icon-btn" onclick="alert('Chat clicked')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
+    </button>
+  </div>
+</header>
+
+<main id="scroller">
+
+  <!-- RESULTS VIEW -->
+  <section class="view active" id="view-results">
+    <!-- Headers -->
+    <div class="header-section">
+      <div class="main-heading">RESULTS</div>
+      <div class="date-heading" id="uiDate">3 NOVEMBER 2026</div>
+      <div class="summary-heading" id="uiSummary">3/3 Categories Won | 100% Hit Rate</div>
+    </div>
+
+    <!-- Top Tabs (Buttons) -->
+    <div class="top-tabs">
+      <button class="top-tab" onclick="setTab(0)">FREE</button>
+      <button class="top-tab active" onclick="setTab(1)">2 ODDS</button>
+      <button class="top-tab" onclick="setTab(2)">3 ODDS</button>
+    </div>
+
+    <!-- The Cards -->
+    <div class="slider-container" id="sliderContainer">
+      <div class="card prev" onclick="setTab(0)">
+        <div class="card-title">Free Picks</div>
+        <div class="card-content" id="cardContent0"></div>
+      </div>
+      <div class="card active" onclick="setTab(1)">
+        <div class="card-title">2 Odds</div>
+        <div class="card-content" id="cardContent1"></div>
+      </div>
+      <div class="card next" onclick="setTab(2)">
+        <div class="card-title">3 Odds</div>
+        <div class="card-content" id="cardContent2"></div>
+      </div>
+    </div>
+
+    <!-- Controls Row -->
+    <div class="controls-row">
+      <div class="chevron" onclick="changeDay(-1)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+      </div>
+      <div class="nav-dots">
+        <div class="dot" onclick="setTab(0)"></div>
+        <div class="dot active" onclick="setTab(1)"></div>
+        <div class="dot" onclick="setTab(2)"></div>
+      </div>
+      <div class="chevron" onclick="changeDay(1)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="footer-text">
+      Past results don't guarantee future returns.<br>
+      Bet responsible.
+    </div>
+  </section>
+
+  <!-- DUMMY VIEWS FOR BOTTOM NAV -->
+  <section class="view" id="view-home"><h1 style="margin-top:40px;">Home View</h1></section>
+  <section class="view" id="view-premium"><h1 style="margin-top:40px;">Premium View</h1></section>
+  <section class="view" id="view-settings"><h1 style="margin-top:40px;">Settings View</h1></section>
+
+</main>
+
+<!-- FLOATING BOTTOM NAV -->
+<nav class="bottomnav">
+  <div class="bottomnav-inner">
+    <div class="nav-item" onclick="showAppView('home')">
+      <svg viewBox="0 0 24 24"><path d="M3 10.5L12 3l9 7.5V20a2 2 0 01-2 2h-4v-7h-6v7H5a2 2 0 01-2-2v-9.5z"/></svg>
+      <span>Home</span>
+    </div>
+    <div class="nav-item active" onclick="showAppView('results')">
+      <svg viewBox="0 0 24 24"><path d="M3 20.5h18"/><path d="M6.5 20.5V14M12 20.5V7.5M17.5 20.5v-9"/></svg>
+      <span>Results</span>
+    </div>
+    <div class="nav-item" onclick="showAppView('premium')">
+      <svg viewBox="0 0 24 24"><path d="M3 8l4.2 3.2L12 4.5l4.8 6.7L21 8l-1.7 10H4.7L3 8z"/><path d="M4.7 21h14.6"/></svg>
+      <span>Premium</span>
+    </div>
+    <div class="nav-item" onclick="showAppView('settings')">
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+      <span>Settings</span>
+    </div>
+  </div>
+</nav>
+
+<script>
+  // Mock Data
+  const db = [
+    {
+      date: "3 NOVEMBER 2026", summary: "3/3 Categories Won | 100% Hit Rate",
+      cards: [
+        { content: "Arsenal vs Chelsea<br><b>Win (2-3)</b>" },
+        { content: "Juventus vs Napoli<br><b>Win (2-1)</b>" },
+        { content: "Real Madrid vs Getafe<br><b>Win (3-0)</b>" }
+      ]
+    },
+    {
+      date: "2 NOVEMBER 2026", summary: "2/3 Categories Won | 66% Hit Rate",
+      cards: [
+        { content: "Bayern vs Augsburg<br><b>Loss (2-1)</b>" },
+        { content: "Man City vs Brighton<br><b>Win (3-1)</b>" },
+        { content: "PSG vs Nantes<br><b>Win (3-1)</b>" }
+      ]
+    },
+    {
+      date: "1 NOVEMBER 2026", summary: "0/3 Categories Won | 0% Hit Rate",
+      cards: [
+        { content: "Barcelona vs Sevilla<br><b>Loss (1-1)</b>" },
+        { content: "Napoli vs Roma<br><b>Loss (0-1)</b>" },
+        { content: "Ajax vs Twente<br><b>Loss (1-0)</b>" }
+      ]
+    }
+  ];
+
+  let currentCardIndex = 1; // Start on middle card
+  let currentDayIndex = 0;
+  const totalCards = 3;
+  let autoScrollTimer;
+  
+  const cards = document.querySelectorAll('.card');
+  const dots = document.querySelectorAll('.dot');
+  const topTabs = document.querySelectorAll('.top-tab');
+  const sliderContainer = document.getElementById('sliderContainer');
+
+  // --- AUTO SCROLL (5 Seconds) ---
+  function startAutoScroll() {
+    clearInterval(autoScrollTimer);
+    autoScrollTimer = setInterval(() => {
+      let nextIndex = (currentCardIndex + 1) % totalCards;
+      goToSlide(nextIndex);
+    }, 5000); 
+  }
+
+  function stopAutoScroll() {
+    clearInterval(autoScrollTimer);
+  }
+
+  function setTab(index) {
+    stopAutoScroll();
+    goToSlide(index);
+    startAutoScroll();
+  }
+
+  // --- CARD & TAB NAVIGATION ---
+  function goToSlide(index) {
+    currentCardIndex = index;
+
+    // Update Cards
+    cards.forEach((card, i) => {
+      card.classList.remove('active', 'prev', 'next');
+      if (i === currentCardIndex) { card.classList.add('active'); } 
+      else if (i === (currentCardIndex - 1 + totalCards) % totalCards) { card.classList.add('prev'); } 
+      else { card.classList.add('next'); }
+    });
+
+    // Update Dots
+    dots.forEach((dot, i) => {
+      dot.classList.toggle('active', i === currentCardIndex);
+    });
+
+    // Update Top Tabs
+    topTabs.forEach((tab, i) => {
+      tab.classList.toggle('active', i === currentCardIndex);
+    });
+  }
+
+  // --- DAY NAVIGATION (Chevrons) ---
+  function changeDay(direction) {
+    currentDayIndex += direction;
+    if (currentDayIndex < 0) currentDayIndex = db.length - 1;
+    if (currentDayIndex >= db.length) currentDayIndex = 0;
+
+    updateDayContent();
+    stopAutoScroll(); // Pause auto-scroll on manual day change
+    startAutoScroll();
+  }
+
+  function updateDayContent() {
+    const dayData = db[currentDayIndex];
+    document.getElementById('uiDate').textContent = dayData.date;
+    document.getElementById('uiSummary').textContent = dayData.summary;
+    for (let i = 0; i < 3; i++) {
+      document.getElementById(`cardContent${i}`).innerHTML = dayData.cards[i].content;
+    }
+  }
+
+  // --- TOUCH SWIPE LOGIC ---
+  let touchStartX = 0;
+  let touchEndX = 0;
+
+  sliderContainer.addEventListener('touchstart', e => {
+    touchStartX = e.changedTouches[0].screenX;
+    stopAutoScroll(); 
+  }, { passive: true });
+
+  sliderContainer.addEventListener('touchend', e => {
+    touchEndX = e.changedTouches[0].screenX;
+    handleSwipe();
+    startAutoScroll();
+  }, { passive: true });
+
+  function handleSwipe() {
+    const swipeThreshold = 50; // Min pixels to trigger swipe
+    if (touchStartX - touchEndX > swipeThreshold) {
+      // Swiped Left -> Next Card
+      setTab((currentCardIndex + 1) % totalCards);
+    } else if (touchEndX - touchStartX > swipeThreshold) {
+      // Swiped Right -> Prev Card
+      setTab((currentCardIndex - 1 + totalCards) % totalCards);
+    }
+  }
+
+  // --- BOTTOM NAV APP NAVIGATION ---
+  function showAppView(viewName) {
+    document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+    document.getElementById(`view-${viewName}`).classList.add('active');
+    
+    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+    event.currentTarget.classList.add('active');
+  }
+
+  // Initialize
+  goToSlide(1);
+  updateDayContent();
+  startAutoScroll();
+</script>
+
+</body>
+</html>
