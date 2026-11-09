@@ -19,6 +19,10 @@
     --border: rgba(15,23,42,0.08);
     --top-h: 60px;
     --bottom-h: 84px;
+    --win-green: #10b981;
+    --win-bg: #d1fae5;
+    --loss-red: #ef4444;
+    --loss-bg: #fee2e2;
   }
   
   * { 
@@ -89,14 +93,10 @@
   .chart-container {
     position: relative; width: 110px; height: 110px; margin: 0 auto 12px;
   }
-  .progress-ring__circle-bg {
-    stroke: var(--tab-bg);
-  }
+  .progress-ring__circle-bg { stroke: var(--tab-bg); }
   .progress-ring__circle {
-    stroke: var(--accent);
-    stroke-linecap: round;
-    transform: rotate(-90deg);
-    transform-origin: 50% 50%;
+    stroke: var(--accent); stroke-linecap: round;
+    transform: rotate(-90deg); transform-origin: 50% 50%;
     transition: stroke-dashoffset 0.6s cubic-bezier(0.25, 1, 0.5, 1);
   }
   .chart-text {
@@ -111,8 +111,7 @@
     display: flex; width: 100%; max-width: 320px;
     background: rgba(255,255,255,0.6); border-radius: 99px;
     padding: 4px; margin-bottom: 24px;
-    border: 1px solid rgba(255,255,255,0.8);
-    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255,255,255,0.8); backdrop-filter: blur(10px);
   }
   .top-tab {
     flex: 1; padding: 10px 0; border: none; background: transparent;
@@ -135,8 +134,8 @@
   /* ============ CARDS ============ */
   .card {
     position: absolute; top: 0; left: 50%; width: 100%; height: 100%;
-    background: rgba(255,255,255,0.9); box-shadow: 0 10px 30px rgba(0,0,0,0.08);
-    border: 1px solid rgba(255,255,255,0.9); padding: 24px;
+    background: rgba(255,255,255,0.95); box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+    border: 1px solid rgba(255,255,255,0.9); padding: 20px;
     transition: transform 0.4s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.4s ease, z-index 0s;
     transform: translateX(-50%) scale(0.8);
     opacity: 0; z-index: 1; pointer-events: none;
@@ -144,12 +143,44 @@
     backdrop-filter: blur(10px);
   }
   .card.active { transform: translateX(-50%) scale(1); opacity: 1; z-index: 3; pointer-events: auto; }
-  .card.prev { transform: translateX(-125%) scale(0.85); opacity: 0.5; z-index: 2; pointer-events: auto; cursor: pointer; }
-  .card.next { transform: translateX(25%) scale(0.85); opacity: 0.5; z-index: 2; pointer-events: auto; cursor: pointer; }
+  .card.prev { transform: translateX(-125%) scale(0.85); opacity: 0.4; z-index: 2; pointer-events: auto; cursor: pointer; }
+  .card.next { transform: translateX(25%) scale(0.85); opacity: 0.4; z-index: 2; pointer-events: auto; cursor: pointer; }
 
-  /* ============ CARD CONTENT ============ */
-  .card-title { font-size: 22px; font-weight: 800; margin-bottom: 20px; text-align: center; color: var(--accent); text-transform: uppercase; }
-  .card-content { flex: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; color: var(--muted); font-weight: 500; line-height: 1.5; }
+  /* ============ NEW CARD CONTENT (BET SLIP STYLE) ============ */
+  .card-status {
+    text-align: center; font-size: 24px; font-weight: 900;
+    letter-spacing: 1px; margin-bottom: 16px; text-transform: uppercase;
+  }
+  .card-status.won { color: var(--win-green); }
+  .card-status.lost { color: var(--loss-red); }
+
+  .legs-container { flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; }
+  
+  .leg-row {
+    display: flex; justify-content: space-between; align-items: center;
+    padding-bottom: 10px; border-bottom: 1px dashed rgba(0,0,0,0.1);
+  }
+  .leg-row:last-child { border-bottom: none; padding-bottom: 0; }
+
+  .leg-info { display: flex; flex-direction: column; gap: 2px; }
+  .leg-match { font-size: 13px; font-weight: 700; color: var(--text); }
+  .leg-tip { font-size: 12px; font-weight: 500; color: var(--muted); }
+  
+  .leg-right { display: flex; flex-direction: column; align-items: flex-end; gap: 4px; }
+  .leg-score { 
+    font-size: 11px; font-weight: 800; padding: 2px 6px; border-radius: 4px; 
+    background: #f1f5f9; color: var(--text);
+  }
+  .leg-score.win { background: var(--win-bg); color: #047857; }
+  .leg-score.loss { background: var(--loss-bg); color: #b91c1c; }
+  .leg-odds { font-size: 13px; font-weight: 800; color: var(--text); }
+
+  .card-total {
+    display: flex; justify-content: space-between; align-items: center;
+    margin-top: 16px; padding-top: 14px; border-top: 2px solid rgba(0,0,0,0.06);
+  }
+  .card-total span { font-size: 12px; font-weight: 700; color: var(--muted); text-transform: uppercase; }
+  .card-total strong { font-size: 20px; font-weight: 900; color: var(--accent); }
 
   /* ============ CONTROLS ROW ============ */
   .controls-row {
@@ -249,17 +280,34 @@
 
     <!-- The Cards -->
     <div class="slider-container" id="sliderContainer">
+      <!-- Card 1: Free -->
       <div class="card prev" onclick="setTab(0)">
-        <div class="card-title">Free Picks</div>
-        <div class="card-content" id="cardContent0"></div>
+        <div class="card-status" id="status0"></div>
+        <div class="legs-container" id="legs0"></div>
+        <div class="card-total">
+          <span>Total Odds</span>
+          <strong id="odds0"></strong>
+        </div>
       </div>
+      
+      <!-- Card 2: 2 Odds -->
       <div class="card active" onclick="setTab(1)">
-        <div class="card-title">2 Odds</div>
-        <div class="card-content" id="cardContent1"></div>
+        <div class="card-status" id="status1"></div>
+        <div class="legs-container" id="legs1"></div>
+        <div class="card-total">
+          <span>Total Odds</span>
+          <strong id="odds1"></strong>
+        </div>
       </div>
+      
+      <!-- Card 3: 3 Odds -->
       <div class="card next" onclick="setTab(2)">
-        <div class="card-title">3 Odds</div>
-        <div class="card-content" id="cardContent2"></div>
+        <div class="card-status" id="status2"></div>
+        <div class="legs-container" id="legs2"></div>
+        <div class="card-total">
+          <span>Total Odds</span>
+          <strong id="odds2"></strong>
+        </div>
       </div>
     </div>
 
@@ -316,7 +364,7 @@
 
 <script>
   // ==========================================
-  // MOCK DATA (Updated with numerical hit rates for the chart)
+  // NEW DATA STRUCTURE WITH MATCHES & SCORES
   // ==========================================
   const db = [
     {
@@ -324,9 +372,30 @@
       categoriesWon: 3, 
       hitRate: 100,
       cards: [
-        { content: "Arsenal vs Chelsea<br><b>Win (2-3)</b>" },
-        { content: "Juventus vs Napoli<br><b>Win (2-1)</b>" },
-        { content: "Real Madrid vs Getafe<br><b>Win (3-0)</b>" }
+        {
+          status: "WON",
+          legs: [
+            { match: "Arsenal vs Chelsea", tip: "Over 2.5 Goals", score: "2-3", res: "win", odds: 1.85 }
+          ],
+          totalOdds: 1.85
+        },
+        {
+          status: "WON",
+          legs: [
+            { match: "Juventus vs Napoli", tip: "Under 3.5 Goals", score: "2-1", res: "win", odds: 1.50 },
+            { match: "Man City vs Brighton", tip: "City to Win", score: "3-1", res: "win", odds: 1.45 }
+          ],
+          totalOdds: 2.17
+        },
+        {
+          status: "WON",
+          legs: [
+            { match: "Real Madrid vs Getafe", tip: "RM -1.5 AH", score: "3-0", res: "win", odds: 1.72 },
+            { match: "PSG vs Nantes", tip: "PSG to Win", score: "2-0", res: "win", odds: 1.30 },
+            { match: "Inter vs Milan", tip: "Inter to Win", score: "2-0", res: "win", odds: 1.95 }
+          ],
+          totalOdds: 4.36
+        }
       ]
     },
     {
@@ -334,9 +403,30 @@
       categoriesWon: 2, 
       hitRate: 66,
       cards: [
-        { content: "Bayern vs Augsburg<br><b>Loss (2-1)</b>" },
-        { content: "Man City vs Brighton<br><b>Win (3-1)</b>" },
-        { content: "PSG vs Nantes<br><b>Win (3-1)</b>" }
+        {
+          status: "LOST",
+          legs: [
+            { match: "Bayern vs Augsburg", tip: "Bayern -1.5 AH", score: "2-1", res: "loss", odds: 1.40 }
+          ],
+          totalOdds: 1.40
+        },
+        {
+          status: "WON",
+          legs: [
+            { match: "Chelsea vs Fulham", tip: "Chelsea Win", score: "2-0", res: "win", odds: 1.65 },
+            { match: "Real Sociedad vs Betis", tip: "Over 1.5", score: "2-2", res: "win", odds: 1.35 }
+          ],
+          totalOdds: 2.22
+        },
+        {
+          status: "WON",
+          legs: [
+            { match: "Tottenham vs Newcastle", tip: "Over 2.5", score: "1-4", res: "win", odds: 1.58 },
+            { match: "Milan vs Atalanta", tip: "Milan Win/Draw", score: "2-1", res: "win", odds: 1.30 },
+            { match: "Lyon vs Marseille", tip: "Lyon to Win", score: "2-1", res: "win", odds: 2.10 }
+          ],
+          totalOdds: 4.31
+        }
       ]
     },
     {
@@ -344,9 +434,30 @@
       categoriesWon: 0, 
       hitRate: 0,
       cards: [
-        { content: "Barcelona vs Sevilla<br><b>Loss (1-1)</b>" },
-        { content: "Napoli vs Roma<br><b>Loss (0-1)</b>" },
-        { content: "Ajax vs Twente<br><b>Loss (1-0)</b>" }
+        {
+          status: "LOST",
+          legs: [
+            { match: "Barcelona vs Sevilla", tip: "Barcelona Win", score: "1-1", res: "loss", odds: 1.62 }
+          ],
+          totalOdds: 1.62
+        },
+        {
+          status: "LOST",
+          legs: [
+            { match: "Napoli vs Roma", tip: "Napoli Win", score: "0-1", res: "loss", odds: 1.80 },
+            { match: "Ajax vs Twente", tip: "Ajax -1.5", score: "1-0", res: "loss", odds: 1.68 }
+          ],
+          totalOdds: 3.02
+        },
+        {
+          status: "LOST",
+          legs: [
+            { match: "Liverpool vs Everton", tip: "Liverpool -1.5", score: "1-0", res: "loss", odds: 1.75 },
+            { match: "Juventus vs Lazio", tip: "Juve Win", score: "0-0", res: "loss", odds: 1.70 },
+            { match: "Benfica vs Porto", tip: "BTTS Yes", score: "0-0", res: "loss", odds: 1.66 }
+          ],
+          totalOdds: 4.93
+        }
       ]
     }
   ];
@@ -361,7 +472,7 @@
   const topTabs = document.querySelectorAll('.top-tab');
   const sliderContainer = document.getElementById('sliderContainer');
   
-  // Chart Configuration
+  // Chart Config
   const circle = document.getElementById('chartCircle');
   const radius = circle.r.baseVal.value;
   const circumference = radius * 2 * Math.PI;
@@ -377,9 +488,7 @@
     }, 5000); 
   }
 
-  function stopAutoScroll() {
-    clearInterval(autoScrollTimer);
-  }
+  function stopAutoScroll() { clearInterval(autoScrollTimer); }
 
   function setTab(index) {
     stopAutoScroll();
@@ -398,16 +507,11 @@
       else { card.classList.add('next'); }
     });
 
-    dots.forEach((dot, i) => {
-      dot.classList.toggle('active', i === currentCardIndex);
-    });
-
-    topTabs.forEach((tab, i) => {
-      tab.classList.toggle('active', i === currentCardIndex);
-    });
+    dots.forEach((dot, i) => dot.classList.toggle('active', i === currentCardIndex));
+    topTabs.forEach((tab, i) => tab.classList.toggle('active', i === currentCardIndex));
   }
 
-  // --- DAY NAVIGATION & CHART UPDATE ---
+  // --- DAY NAVIGATION & CONTENT RENDERING ---
   function changeDay(direction) {
     currentDayIndex += direction;
     if (currentDayIndex < 0) currentDayIndex = db.length - 1;
@@ -421,19 +525,39 @@
   function updateDayContent() {
     const dayData = db[currentDayIndex];
     
-    // Update Text
+    // Update Header & Chart
     document.getElementById('uiDate').textContent = dayData.date;
     document.getElementById('uiCategories').textContent = `${dayData.categoriesWon}/3 Categories Won`;
     document.getElementById('uiHitRate').textContent = `${dayData.hitRate}%`;
     
-    // Update Cards
-    for (let i = 0; i < 3; i++) {
-      document.getElementById(`cardContent${i}`).innerHTML = dayData.cards[i].content;
-    }
-    
-    // Animate the Circular Chart
     const offset = circumference - (dayData.hitRate / 100) * circumference;
     circle.style.strokeDashoffset = offset;
+    
+    // Render each of the 3 cards
+    dayData.cards.forEach((cardData, i) => {
+      // Status (Won/Lost)
+      const statusEl = document.getElementById(`status${i}`);
+      statusEl.textContent = cardData.status;
+      statusEl.className = `card-status ${cardData.status.toLowerCase()}`;
+      
+      // Legs (Matches)
+      const legsEl = document.getElementById(`legs${i}`);
+      legsEl.innerHTML = cardData.legs.map(leg => `
+        <div class="leg-row">
+          <div class="leg-info">
+            <span class="leg-match">${leg.match}</span>
+            <span class="leg-tip">${leg.tip}</span>
+          </div>
+          <div class="leg-right">
+            <span class="leg-score ${leg.res}">${leg.score}</span>
+            <span class="leg-odds">${leg.odds.toFixed(2)}</span>
+          </div>
+        </div>
+      `).join('');
+      
+      // Total Odds
+      document.getElementById(`odds${i}`).textContent = cardData.totalOdds.toFixed(2);
+    });
   }
 
   // --- TOUCH SWIPE LOGIC ---
