@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --accent: #ff5f2e;
+    --card-bg: #ffffff;
+    --text: #0f172a;
+    --muted: #64748b;
+  }
+  
+  * { 
+    box-sizing: border-box; 
+    margin: 0; 
+    padding: 0; 
+    font-family: 'Montserrat', sans-serif;
+  }
+
+  /* --- ORANGE & WHITE BLUR GRADIENT BACKGROUND --- */
+  body {
+    background-color: #ffffff;
+    background-image: 
+      radial-gradient(circle at 10% 10%, rgba(255, 138, 61, 0.25) 0%, transparent 50%),
+      radial-gradient(circle at 90% 90%, rgba(255, 95, 46, 0.2) 0%, transparent 50%);
+    color: var(--text);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-height: 100vh;
+    padding-top: 40px;
+    overflow-x: hidden;
+  }
+
+  /* --- HEADER SECTION --- */
+  .header-section {
+    text-align: center;
+    margin-bottom: 24px;
+    width: 100%;
+    padding: 0 20px;
+  }
+
+  .main-heading {
+    font-size: 28px;
+    font-weight: 800;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+
+  .date-heading {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--text);
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+
+  .summary-heading {
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--muted);
+  }
+
+  /* --- 1. THE SLIDER CONTAINER --- */
+  .slider-container {
+    position: relative;
+    width: 100%;
+    max-width: 320px;
+    height: 380px;
+    perspective: 1000px;
+    margin-bottom: 30px;
+  }
+
+  /* --- 2. THE CARDS (NO BORDER RADIUS) --- */
+  .card {
+    position: absolute;
+    top: 0;
+    left: 50%;
+    width: 100%;
+    height: 100%;
+    background: var(--card-bg);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+    border: 1px solid rgba(0,0,0,0.04);
+    padding: 24px;
+    transition: transform 0.4s cubic-bezier(0.25, 1, 0.5, 1), 
+                opacity 0.4s ease, 
+                z-index 0s;
+    transform: translateX(-50%) scale(0.8);
+    opacity: 0;
+    z-index: 1;
+    pointer-events: none;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .card.active {
+    transform: translateX(-50%) scale(1);
+    opacity: 1;
+    z-index: 3;
+    pointer-events: auto;
+  }
+
+  .card.prev {
+    transform: translateX(-125%) scale(0.85);
+    opacity: 0.5;
+    z-index: 2;
+    pointer-events: auto;
+    cursor: pointer;
+  }
+
+  .card.next {
+    transform: translateX(25%) scale(0.85);
+    opacity: 0.5;
+    z-index: 2;
+    pointer-events: auto;
+    cursor: pointer;
+  }
+
+  /* --- 3. CARD CONTENT --- */
+  .card-title {
+    font-size: 22px;
+    font-weight: 800;
+    margin-bottom: 20px;
+    text-align: center;
+    color: var(--accent);
+    text-transform: uppercase;
+  }
+
+  .card-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    color: var(--muted);
+    font-weight: 500;
+    line-height: 1.5;
+  }
+
+  /* --- 4. CONTROLS ROW (Chevrons + Dots) --- */
+  .controls-row {
+    position: relative;
+    width: 100%;
+    max-width: 320px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 30px;
+    margin-bottom: 24px;
+  }
+
+  /* Chevrons */
+  .chevron {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 30px;
+    color: var(--text);
+    cursor: pointer;
+    transition: transform 0.15s ease;
+  }
+  .chevron:active {
+    transform: scale(0.85);
+  }
+  .chevron svg {
+    height: 30px; 
+    width: auto;
+  }
+
+  /* Dots Container */
+  .nav-dots {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    height: 30px;
+  }
+
+  /* Dots */
+  .dot {
+    width: 7.5px;
+    height: 15px;
+    border-radius: 4px;
+    background: rgba(15, 23, 42, 0.15);
+    transition: all 0.3s cubic-bezier(0.25, 1, 0.5, 1);
+    cursor: pointer;
+  }
+
+  .dot.active {
+    height: 30px;
+    background: var(--accent);
+  }
+
+  /* --- 5. FOOTER --- */
+  .footer-text {
+    font-size: 12px;
+    color: var(--muted);
+    text-align: center;
+    padding: 0 20px;
+    line-height: 1.6;
+    font-weight: 500;
+  }
+
+</style>
+</head>
+<body>
+
+  <!-- HEADER -->
+  <div class="header-section">
+    <div class="main-heading">RESULTS</div>
+    <div class="date-heading" id="uiDate">3 NOVEMBER 2026</div>
+    <div class="summary-heading" id="uiSummary">3/3 Categories Won | 100% Hit Rate</div>
+  </div>
+
+  <!-- SLIDER AREA -->
+  <div class="slider-container">
+    <!-- Card 1: Free (Starts as Prev) -->
+    <div class="card prev" onclick="handleManualClick(0)">
+      <div class="card-title">Free Picks</div>
+      <div class="card-content" id="cardContent0"></div>
+    </div>
+    
+    <!-- Card 2: 2 Odds (Starts as Active / Middle) -->
+    <div class="card active" onclick="handleManualClick(1)">
+      <div class="card-title">2 Odds</div>
+      <div class="card-content" id="cardContent1"></div>
+    </div>
+    
+    <!-- Card 3: 3 Odds (Starts as Next) -->
+    <div class="card next" onclick="handleManualClick(2)">
+      <div class="card-title">3 Odds</div>
+      <div class="card-content" id="cardContent2"></div>
+    </div>
+  </div>
+
+  <!-- CONTROLS ROW -->
+  <div class="controls-row">
+    
+    <!-- Left Chevron (Prev Day) -->
+    <div class="chevron" onclick="changeDay(-1)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M15 18l-6-6 6-6"/>
+      </svg>
+    </div>
+
+    <!-- Navigation Dots (Categories) -->
+    <div class="nav-dots">
+      <div class="dot" onclick="handleManualClick(0)"></div>
+      <div class="dot active" onclick="handleManualClick(1)"></div>
+      <div class="dot" onclick="handleManualClick(2)"></div>
+    </div>
+
+    <!-- Right Chevron (Next Day) -->
+    <div class="chevron" onclick="changeDay(1)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M9 18l6-6-6-6"/>
+      </svg>
+    </div>
+
+  </div>
+
+  <!-- FOOTER -->
+  <div class="footer-text">
+    Past results don't guarantee future returns.<br>
+    Bet responsible.
+  </div>
+
+<script>
+  // ==========================================
+  // MOCK DATA (3 Days of results)
+  // ==========================================
+  const db = [
+    {
+      date: "3 NOVEMBER 2026",
+      summary: "3/3 Categories Won | 100% Hit Rate",
+      cards: [
+        { content: "Arsenal vs Chelsea<br><b>Win (2-3)</b>" },
+        { content: "Juventus vs Napoli<br><b>Win (2-1)</b>" },
+        { content: "Real Madrid vs Getafe<br><b>Win (3-0)</b>" }
+      ]
+    },
+    {
+      date: "2 NOVEMBER 2026",
+      summary: "2/3 Categories Won | 66% Hit Rate",
+      cards: [
+        { content: "Bayern vs Augsburg<br><b>Loss (2-1)</b>" },
+        { content: "Man City vs Brighton<br><b>Win (3-1)</b>" },
+        { content: "PSG vs Nantes<br><b>Win (3-1)</b>" }
+      ]
+    },
+    {
+      date: "1 NOVEMBER 2026",
+      summary: "0/3 Categories Won | 0% Hit Rate",
+      cards: [
+        { content: "Barcelona vs Sevilla<br><b>Loss (1-1)</b>" },
+        { content: "2 Odds: Napoli vs Roma<br><b>Loss (0-1)</b>" },
+        { content: "Ajax vs Twente<br><b>Loss (1-0)</b>" }
+      ]
+    }
+  ];
+
+  let currentCardIndex = 1; // Start on the middle card (2 Odds)
+  let currentDayIndex = 0;
+  const totalCards = 3;
+  let autoScrollTimer;
+  
+  const cards = document.querySelectorAll('.card');
+  const dots = document.querySelectorAll('.dot');
+
+  // ==========================================
+  // AUTO-SCROLL LOGIC
+  // ==========================================
+  function startAutoScroll() {
+    clearInterval(autoScrollTimer);
+    autoScrollTimer = setInterval(() => {
+      let nextIndex = (currentCardIndex + 1) % totalCards;
+      goToSlide(nextIndex);
+    }, 3000); // 3 seconds
+  }
+
+  function stopAutoScroll() {
+    clearInterval(autoScrollTimer);
+  }
+
+  // Handles both Dots and clicking side cards
+  function handleManualClick(index) {
+    stopAutoScroll();
+    goToSlide(index);
+    startAutoScroll(); // Restart timer after user interaction
+  }
+
+  // ==========================================
+  // CARD NAVIGATION
+  // ==========================================
+  function goToSlide(index) {
+    currentCardIndex = index;
+
+    // Update Card Stack
+    cards.forEach((card, i) => {
+      card.classList.remove('active', 'prev', 'next');
+
+      if (i === currentCardIndex) {
+        card.classList.add('active');
+      } 
+      else if (i === (currentCardIndex - 1 + totalCards) % totalCards) {
+        card.classList.add('prev');
+      } 
+      else {
+        card.classList.add('next');
+      }
+    });
+
+    // Update Dots
+    dots.forEach((dot, i) => {
+      if (i === currentCardIndex) {
+        dot.classList.add('active');
+      } else {
+        dot.classList.remove('active');
+      }
+    });
+  }
+
+  // ==========================================
+  // DAY NAVIGATION (Chevrons)
+  // ==========================================
+  function changeDay(direction) {
+    currentDayIndex = currentDayIndex + direction;
+    if (currentDayIndex < 0) currentDayIndex = db.length - 1;
+    if (currentDayIndex >= db.length) currentDayIndex = 0;
+
+    updateDayContent();
+    
+    // Optional: Stop auto-scroll when changing days so user can read
+    stopAutoScroll();
+    startAutoScroll();
+  }
+
+  function updateDayContent() {
+    const dayData = db[currentDayIndex];
+    
+    document.getElementById('uiDate').textContent = dayData.date;
+    document.getElementById('uiSummary').textContent = dayData.summary;
+
+    for (let i = 0; i < 3; i++) {
+      document.getElementById(`cardContent${i}`).innerHTML = dayData.cards[i].content;
+    }
+  }
+
+  // Initialize everything
+  goToSlide(1); // Set to middle card
+  updateDayContent();
+  startAutoScroll(); // Start the 3-second timer
+</script>
+
+</body>
+</html>
