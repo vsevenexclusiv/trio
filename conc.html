@@ -31,18 +31,24 @@
 
   body {
     background-color: #ffffff;
-    background-image: 
-      radial-gradient(circle at 10% 10%, rgba(255, 138, 61, 0.25) 0%, transparent 50%),
-      radial-gradient(circle at 90% 90%, rgba(255, 95, 46, 0.2) 0%, transparent 50%);
     color: var(--text);
     overflow: hidden;
   }
+
+  /* ============ GRADIENT BLUR BACKGROUND ============ */
+  .bg-deco {
+    position: fixed; inset: 0; z-index: -1; overflow: hidden; pointer-events: none; background: #ffffff;
+  }
+  .blob { position: absolute; border-radius: 50%; filter: blur(90px); opacity: 0.7; }
+  .b1 { width: 320px; height: 320px; background: #ffccbc; top: -80px; left: -80px; }
+  .b2 { width: 420px; height: 420px; background: #ffe0b2; bottom: -50px; right: -120px; }
+  .b3 { width: 280px; height: 280px; background: #ffab91; top: 30%; left: 10%; opacity: 0.5; }
 
   /* ============ TOP BAR ============ */
   .topbar {
     position: fixed; top: 0; left: 0; right: 0; z-index: 50;
     padding: calc(env(safe-area-inset-top) + 12px) 16px 12px;
-    background: rgba(255, 255, 255, 0.85);
+    background: rgba(255, 255, 255, 0.7);
     backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px);
     border-bottom: 1px solid var(--border);
     display: flex; align-items: center; justify-content: space-between;
@@ -59,7 +65,7 @@
   .icon-btn {
     width: 38px; height: 38px; border-radius: 12px;
     display: flex; align-items: center; justify-content: center;
-    background: rgba(255,255,255,0.7); border: 1px solid var(--border); color: var(--text);
+    background: rgba(255,255,255,0.5); border: 1px solid var(--border); color: var(--text);
   }
   .icon-btn svg { width: 18px; height: 18px; }
 
@@ -74,26 +80,48 @@
   .view.active { display: flex; flex-direction: column; align-items: center; }
   @keyframes fade { from{opacity:0; transform:translateY(6px);} to{opacity:1; transform:none;} }
 
-  /* ============ HEADERS ============ */
+  /* ============ HEADERS & CHART ============ */
   .header-section { text-align: center; margin-bottom: 20px; width: 100%; }
-  .main-heading { font-size: 28px; font-weight: 900; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 8px; }
-  .date-heading { font-size: 18px; font-weight: 700; text-transform: uppercase; margin-bottom: 6px; }
-  .summary-heading { font-size: 13px; font-weight: 500; color: var(--muted); }
+  .main-heading { font-size: 28px; font-weight: 900; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 6px; }
+  .date-heading { font-size: 18px; font-weight: 700; text-transform: uppercase; margin-bottom: 16px; }
+
+  /* Circular Chart */
+  .chart-container {
+    position: relative; width: 110px; height: 110px; margin: 0 auto 12px;
+  }
+  .progress-ring__circle-bg {
+    stroke: var(--tab-bg);
+  }
+  .progress-ring__circle {
+    stroke: var(--accent);
+    stroke-linecap: round;
+    transform: rotate(-90deg);
+    transform-origin: 50% 50%;
+    transition: stroke-dashoffset 0.6s cubic-bezier(0.25, 1, 0.5, 1);
+  }
+  .chart-text {
+    position: absolute; inset: 0;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 22px; font-weight: 900; color: var(--text);
+  }
+  .summary-heading { font-size: 13px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; }
 
   /* ============ TOP TABS (Buttons) ============ */
   .top-tabs {
     display: flex; width: 100%; max-width: 320px;
-    background: var(--tab-bg); border-radius: 99px;
+    background: rgba(255,255,255,0.6); border-radius: 99px;
     padding: 4px; margin-bottom: 24px;
+    border: 1px solid rgba(255,255,255,0.8);
+    backdrop-filter: blur(10px);
   }
   .top-tab {
     flex: 1; padding: 10px 0; border: none; background: transparent;
-    font-size: 13px; font-weight: 800; color: var(--tab-text);
+    font-size: 13px; font-weight: 800; color: var(--muted);
     text-transform: uppercase; border-radius: 99px;
     transition: all 0.2s ease; cursor: pointer;
   }
   .top-tab.active {
-    background: #fff; color: var(--tab-text);
+    background: #fff; color: var(--accent);
     box-shadow: 0 2px 8px rgba(0,0,0,0.08);
   }
 
@@ -101,18 +129,19 @@
   .slider-container {
     position: relative; width: 100%; max-width: 320px;
     height: 380px; perspective: 1000px; margin-bottom: 30px;
-    touch-action: pan-y; /* Allows vertical scroll, captures horizontal swipe */
+    touch-action: pan-y;
   }
 
   /* ============ CARDS ============ */
   .card {
     position: absolute; top: 0; left: 50%; width: 100%; height: 100%;
-    background: var(--card-bg); box-shadow: 0 10px 30px rgba(0,0,0,0.08);
-    border: 1px solid rgba(0,0,0,0.04); padding: 24px;
+    background: rgba(255,255,255,0.9); box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+    border: 1px solid rgba(255,255,255,0.9); padding: 24px;
     transition: transform 0.4s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.4s ease, z-index 0s;
     transform: translateX(-50%) scale(0.8);
     opacity: 0; z-index: 1; pointer-events: none;
     display: flex; flex-direction: column;
+    backdrop-filter: blur(10px);
   }
   .card.active { transform: translateX(-50%) scale(1); opacity: 1; z-index: 3; pointer-events: auto; }
   .card.prev { transform: translateX(-125%) scale(0.85); opacity: 0.5; z-index: 2; pointer-events: auto; cursor: pointer; }
@@ -133,7 +162,6 @@
 
   .nav-dots { display: flex; align-items: center; gap: 6px; height: 30px; }
   
-  /* Removed border radius */
   .dot {
     width: 7.5px; height: 15px; border-radius: 0;
     background: rgba(15, 23, 42, 0.15); transition: all 0.3s cubic-bezier(0.25, 1, 0.5, 1); cursor: pointer;
@@ -146,7 +174,7 @@
   /* ============ FLOATING BOTTOM NAV ============ */
   .bottomnav {
     position: fixed; bottom: calc(16px + env(safe-area-inset-bottom)); left: 16px; right: 16px; z-index: 50;
-    background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px);
+    background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px);
     border-radius: 32px; box-shadow: 0 8px 32px rgba(15,23,42,0.08); border: 1px solid rgba(255,255,255,0.8);
     max-width: 500px; margin: 0 auto;
   }
@@ -163,6 +191,13 @@
 </style>
 </head>
 <body>
+
+<!-- GRADIENT BLUR BACKGROUND -->
+<div class="bg-deco">
+  <div class="blob b1"></div>
+  <div class="blob b2"></div>
+  <div class="blob b3"></div>
+</div>
 
 <!-- TOP BAR -->
 <header class="topbar">
@@ -186,11 +221,23 @@
 
   <!-- RESULTS VIEW -->
   <section class="view active" id="view-results">
-    <!-- Headers -->
+    
+    <!-- Headers & Chart -->
     <div class="header-section">
       <div class="main-heading">RESULTS</div>
       <div class="date-heading" id="uiDate">3 NOVEMBER 2026</div>
-      <div class="summary-heading" id="uiSummary">3/3 Categories Won | 100% Hit Rate</div>
+      
+      <!-- Circular Chart -->
+      <div class="chart-container">
+        <svg class="progress-ring" width="110" height="110">
+          <circle class="progress-ring__circle-bg" stroke-width="10" fill="transparent" r="45" cx="55" cy="55"/>
+          <circle class="progress-ring__circle" stroke-width="10" fill="transparent" r="45" cx="55" cy="55" id="chartCircle"/>
+        </svg>
+        <div class="chart-text">
+          <span id="uiHitRate">100%</span>
+        </div>
+      </div>
+      <div class="summary-heading" id="uiCategories">3/3 Categories Won</div>
     </div>
 
     <!-- Top Tabs (Buttons) -->
@@ -268,10 +315,14 @@
 </nav>
 
 <script>
-  // Mock Data
+  // ==========================================
+  // MOCK DATA (Updated with numerical hit rates for the chart)
+  // ==========================================
   const db = [
     {
-      date: "3 NOVEMBER 2026", summary: "3/3 Categories Won | 100% Hit Rate",
+      date: "3 NOVEMBER 2026", 
+      categoriesWon: 3, 
+      hitRate: 100,
       cards: [
         { content: "Arsenal vs Chelsea<br><b>Win (2-3)</b>" },
         { content: "Juventus vs Napoli<br><b>Win (2-1)</b>" },
@@ -279,7 +330,9 @@
       ]
     },
     {
-      date: "2 NOVEMBER 2026", summary: "2/3 Categories Won | 66% Hit Rate",
+      date: "2 NOVEMBER 2026", 
+      categoriesWon: 2, 
+      hitRate: 66,
       cards: [
         { content: "Bayern vs Augsburg<br><b>Loss (2-1)</b>" },
         { content: "Man City vs Brighton<br><b>Win (3-1)</b>" },
@@ -287,7 +340,9 @@
       ]
     },
     {
-      date: "1 NOVEMBER 2026", summary: "0/3 Categories Won | 0% Hit Rate",
+      date: "1 NOVEMBER 2026", 
+      categoriesWon: 0, 
+      hitRate: 0,
       cards: [
         { content: "Barcelona vs Sevilla<br><b>Loss (1-1)</b>" },
         { content: "Napoli vs Roma<br><b>Loss (0-1)</b>" },
@@ -296,7 +351,7 @@
     }
   ];
 
-  let currentCardIndex = 1; // Start on middle card
+  let currentCardIndex = 1;
   let currentDayIndex = 0;
   const totalCards = 3;
   let autoScrollTimer;
@@ -305,8 +360,15 @@
   const dots = document.querySelectorAll('.dot');
   const topTabs = document.querySelectorAll('.top-tab');
   const sliderContainer = document.getElementById('sliderContainer');
+  
+  // Chart Configuration
+  const circle = document.getElementById('chartCircle');
+  const radius = circle.r.baseVal.value;
+  const circumference = radius * 2 * Math.PI;
+  circle.style.strokeDasharray = `${circumference} ${circumference}`;
+  circle.style.strokeDashoffset = circumference;
 
-  // --- AUTO SCROLL (5 Seconds) ---
+  // --- AUTO SCROLL ---
   function startAutoScroll() {
     clearInterval(autoScrollTimer);
     autoScrollTimer = setInterval(() => {
@@ -329,7 +391,6 @@
   function goToSlide(index) {
     currentCardIndex = index;
 
-    // Update Cards
     cards.forEach((card, i) => {
       card.classList.remove('active', 'prev', 'next');
       if (i === currentCardIndex) { card.classList.add('active'); } 
@@ -337,35 +398,42 @@
       else { card.classList.add('next'); }
     });
 
-    // Update Dots
     dots.forEach((dot, i) => {
       dot.classList.toggle('active', i === currentCardIndex);
     });
 
-    // Update Top Tabs
     topTabs.forEach((tab, i) => {
       tab.classList.toggle('active', i === currentCardIndex);
     });
   }
 
-  // --- DAY NAVIGATION (Chevrons) ---
+  // --- DAY NAVIGATION & CHART UPDATE ---
   function changeDay(direction) {
     currentDayIndex += direction;
     if (currentDayIndex < 0) currentDayIndex = db.length - 1;
     if (currentDayIndex >= db.length) currentDayIndex = 0;
 
     updateDayContent();
-    stopAutoScroll(); // Pause auto-scroll on manual day change
+    stopAutoScroll();
     startAutoScroll();
   }
 
   function updateDayContent() {
     const dayData = db[currentDayIndex];
+    
+    // Update Text
     document.getElementById('uiDate').textContent = dayData.date;
-    document.getElementById('uiSummary').textContent = dayData.summary;
+    document.getElementById('uiCategories').textContent = `${dayData.categoriesWon}/3 Categories Won`;
+    document.getElementById('uiHitRate').textContent = `${dayData.hitRate}%`;
+    
+    // Update Cards
     for (let i = 0; i < 3; i++) {
       document.getElementById(`cardContent${i}`).innerHTML = dayData.cards[i].content;
     }
+    
+    // Animate the Circular Chart
+    const offset = circumference - (dayData.hitRate / 100) * circumference;
+    circle.style.strokeDashoffset = offset;
   }
 
   // --- TOUCH SWIPE LOGIC ---
@@ -384,12 +452,10 @@
   }, { passive: true });
 
   function handleSwipe() {
-    const swipeThreshold = 50; // Min pixels to trigger swipe
+    const swipeThreshold = 50;
     if (touchStartX - touchEndX > swipeThreshold) {
-      // Swiped Left -> Next Card
       setTab((currentCardIndex + 1) % totalCards);
     } else if (touchEndX - touchStartX > swipeThreshold) {
-      // Swiped Right -> Prev Card
       setTab((currentCardIndex - 1 + totalCards) % totalCards);
     }
   }
