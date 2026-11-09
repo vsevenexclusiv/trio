@@ -105,52 +105,28 @@
   .conf-fill { height: 100%; background: var(--accent); }
   .conf-meta { display: flex; justify-content: space-between; font-size: 11px; font-weight: 600; color: var(--muted); margin-top: 8px; }
 
-  /* ============ PREMIUM PAGE ============ */
-  .premium-hero {
-    width: 100%; background: var(--card-bg); backdrop-filter: blur(10px);
-    box-shadow: 0 10px 30px rgba(0,0,0,0.08); border: 1px solid rgba(255,255,255,0.9);
-    padding: 30px 20px; text-align: center; margin-bottom: 24px;
-  }
-  .hero-icon {
-    width: 60px; height: 60px; margin: 0 auto 16px; background: var(--accent-soft); color: var(--accent);
-    display: flex; align-items: center; justify-content: center;
-  }
-  .hero-icon svg { width: 32px; height: 32px; }
-  .premium-hero h2 { font-size: 22px; font-weight: 900; text-transform: uppercase; margin-bottom: 8px; }
-  .premium-hero p { font-size: 13px; font-weight: 500; color: var(--muted); margin-bottom: 24px; line-height: 1.5; }
-  .btn-cta {
-    display: flex; justify-content: center; align-items: center; gap: 8px; width: 100%;
-    background: var(--accent); color: #fff; padding: 16px; font-size: 15px; font-weight: 800;
-    text-transform: uppercase; border: none; cursor: pointer; transition: background 0.2s;
-  }
-  .btn-cta:active { background: #e54e20; }
-  
-  .feature-list { width: 100%; display: flex; flex-direction: column; gap: 12px; }
-  .feature-item {
-    background: var(--card-bg); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.9);
-    padding: 16px; display: flex; align-items: center; gap: 16px; box-shadow: 0 4px 15px rgba(0,0,0,0.03);
-  }
-  .feature-icon { width: 40px; height: 40px; flex: 0 0 40px; background: #f1f5f9; color: var(--text); display: flex; align-items: center; justify-content: center; }
-  .feature-icon svg { width: 20px; height: 20px; }
-  .feature-info h4 { font-size: 14px; font-weight: 800; text-transform: uppercase; margin-bottom: 4px; }
-  .feature-info p { font-size: 12px; font-weight: 500; color: var(--muted); }
+  /* ============ SLIDER CONTAINERS (Shared) ============ */
+  .slider-container { position: relative; width: 100%; max-width: 320px; perspective: 1000px; margin-bottom: 30px; touch-action: pan-y; }
+  .slider-results { height: 380px; }
+  .slider-premium { height: 420px; }
 
-  /* ============ SETTINGS PAGE ============ */
-  .settings-list { width: 100%; display: flex; flex-direction: column; gap: 12px; }
-  .settings-item {
-    background: var(--card-bg); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.9);
-    padding: 16px; display: flex; align-items: center; justify-content: space-between;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.03); cursor: pointer;
+  /* ============ SHARED SLIDE ITEM STYLES ============ */
+  .card, .pricing-card {
+    position: absolute; top: 0; left: 50%; width: 100%; height: 100%;
+    background: var(--card-bg); backdrop-filter: blur(10px);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.08); border: 1px solid rgba(255,255,255,0.9);
+    transition: transform 0.4s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.4s ease, z-index 0s;
+    transform: translateX(-50%) scale(0.8);
+    opacity: 0; z-index: 1; pointer-events: none;
+    display: flex; flex-direction: column;
   }
-  .settings-left { display: flex; align-items: center; gap: 16px; }
-  .settings-icon { width: 40px; height: 40px; background: #f1f5f9; color: var(--text); display: flex; align-items: center; justify-content: center; }
-  .settings-icon svg { width: 20px; height: 20px; }
-  .settings-text h4 { font-size: 14px; font-weight: 800; margin-bottom: 2px; }
-  .settings-text p { font-size: 12px; font-weight: 500; color: var(--muted); }
-  .settings-right { color: var(--dim); }
-  .settings-right svg { width: 18px; height: 18px; }
+  
+  .card.active, .pricing-card.active { transform: translateX(-50%) scale(1); opacity: 1; z-index: 3; pointer-events: auto; }
+  .card.prev, .pricing-card.prev { transform: translateX(-125%) scale(0.85); opacity: 0.4; z-index: 2; pointer-events: auto; cursor: pointer; }
+  .card.next, .pricing-card.next { transform: translateX(25%) scale(0.85); opacity: 0.4; z-index: 2; pointer-events: auto; cursor: pointer; }
 
   /* ============ RESULTS PAGE SPECIFICS ============ */
+  .card { padding: 20px; }
   .header-section { text-align: center; margin-bottom: 20px; width: 100%; }
   .main-heading { font-size: 28px; font-weight: 900; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 6px; }
   .date-heading { font-size: 18px; font-weight: 700; text-transform: uppercase; margin-bottom: 16px; }
@@ -164,12 +140,6 @@
   .top-tabs { display: flex; width: 100%; max-width: 320px; background: rgba(255,255,255,0.6); border-radius: 99px; padding: 4px; margin-bottom: 24px; border: 1px solid rgba(255,255,255,0.8); backdrop-filter: blur(10px); }
   .top-tab { flex: 1; padding: 10px 0; border: none; background: transparent; font-size: 13px; font-weight: 800; color: var(--muted); text-transform: uppercase; border-radius: 99px; transition: all 0.2s ease; cursor: pointer; }
   .top-tab.active { background: #fff; color: var(--accent); box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
-
-  .slider-container { position: relative; width: 100%; max-width: 320px; height: 380px; perspective: 1000px; margin-bottom: 30px; touch-action: pan-y; }
-  .card { position: absolute; top: 0; left: 50%; width: 100%; height: 100%; background: var(--card-bg); box-shadow: 0 10px 30px rgba(0,0,0,0.08); border: 1px solid rgba(255,255,255,0.9); padding: 20px; transition: transform 0.4s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.4s ease, z-index 0s; transform: translateX(-50%) scale(0.8); opacity: 0; z-index: 1; pointer-events: none; display: flex; flex-direction: column; backdrop-filter: blur(10px); }
-  .card.active { transform: translateX(-50%) scale(1); opacity: 1; z-index: 3; pointer-events: auto; }
-  .card.prev { transform: translateX(-125%) scale(0.85); opacity: 0.4; z-index: 2; pointer-events: auto; cursor: pointer; }
-  .card.next { transform: translateX(25%) scale(0.85); opacity: 0.4; z-index: 2; pointer-events: auto; cursor: pointer; }
 
   .card-status { text-align: center; font-size: 24px; font-weight: 900; letter-spacing: 1px; margin-bottom: 16px; text-transform: uppercase; }
   .card-status.won { color: var(--win-green); }
@@ -189,6 +159,24 @@
   .card-total span { font-size: 12px; font-weight: 700; color: var(--muted); text-transform: uppercase; }
   .card-total strong { font-size: 20px; font-weight: 900; color: var(--accent); }
 
+  /* ============ PREMIUM PAGE SPECIFICS ============ */
+  .pricing-card { padding: 30px 24px; position: absolute; }
+  .pricing-card.featured { border: 2px solid var(--accent); }
+  .featured-badge { position: absolute; top: 0; right: 0; background: var(--accent); color: #fff; font-size: 10px; font-weight: 800; padding: 6px 12px; text-transform: uppercase; letter-spacing: 0.5px; }
+  .p-tier { font-size: 14px; font-weight: 800; color: var(--muted); text-transform: uppercase; margin-bottom: 8px; letter-spacing: 1px; }
+  .p-price { font-size: 42px; font-weight: 900; color: var(--text); margin-bottom: 4px; line-height: 1; }
+  .p-price span { font-size: 16px; font-weight: 700; color: var(--muted); }
+  .p-desc { font-size: 13px; font-weight: 500; color: var(--muted); margin-bottom: 24px; line-height: 1.5; }
+  .p-features { list-style: none; margin-bottom: 30px; flex: 1; }
+  .p-features li { font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 12px; display: flex; align-items: center; gap: 10px; }
+  .p-features li svg { width: 16px; height: 16px; color: var(--accent); flex: 0 0 16px; }
+  .p-btn { width: 100%; padding: 16px; font-size: 14px; font-weight: 800; text-transform: uppercase; border: none; cursor: pointer; transition: background 0.2s; text-align: center; }
+  .p-btn.solid { background: var(--accent); color: #fff; }
+  .p-btn.solid:active { background: #e54e20; }
+  .p-btn.outline { background: transparent; border: 2px solid var(--accent); color: var(--accent); }
+  .p-btn.outline:active { background: var(--accent-soft); }
+
+  /* ============ CONTROLS ROW ============ */
   .controls-row { width: 100%; max-width: 320px; display: flex; align-items: center; justify-content: space-between; height: 30px; margin-bottom: 24px; }
   .chevron { display: flex; align-items: center; justify-content: center; width: 32px; height: 30px; color: var(--text); cursor: pointer; }
   .chevron:active { transform: scale(0.85); }
@@ -199,13 +187,19 @@
 
   .footer-text { font-size: 12px; color: var(--muted); text-align: center; line-height: 1.6; font-weight: 500; margin-top: 10px; }
 
+  /* ============ SETTINGS PAGE ============ */
+  .settings-list { width: 100%; display: flex; flex-direction: column; gap: 12px; }
+  .settings-item { background: var(--card-bg); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.9); padding: 16px; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 4px 15px rgba(0,0,0,0.03); cursor: pointer; }
+  .settings-left { display: flex; align-items: center; gap: 16px; }
+  .settings-icon { width: 40px; height: 40px; background: #f1f5f9; color: var(--text); display: flex; align-items: center; justify-content: center; }
+  .settings-icon svg { width: 20px; height: 20px; }
+  .settings-text h4 { font-size: 14px; font-weight: 800; margin-bottom: 2px; }
+  .settings-text p { font-size: 12px; font-weight: 500; color: var(--muted); }
+  .settings-right { color: var(--dim); }
+  .settings-right svg { width: 18px; height: 18px; }
+
   /* ============ FLOATING BOTTOM NAV ============ */
-  .bottomnav {
-    position: fixed; bottom: calc(16px + env(safe-area-inset-bottom)); left: 16px; right: 16px; z-index: 50;
-    background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px);
-    border-radius: 32px; box-shadow: 0 8px 32px rgba(15,23,42,0.08); border: 1px solid rgba(255,255,255,0.8);
-    max-width: 500px; margin: 0 auto;
-  }
+  .bottomnav { position: fixed; bottom: calc(16px + env(safe-area-inset-bottom)); left: 16px; right: 16px; z-index: 50; background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px); border-radius: 32px; box-shadow: 0 8px 32px rgba(15,23,42,0.08); border: 1px solid rgba(255,255,255,0.8); max-width: 500px; margin: 0 auto; }
   .bottomnav-inner { height: 68px; display: flex; justify-content: space-around; align-items: center; padding: 0 8px; }
   .nav-item { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; padding: 8px 0; color: var(--dim); transition: all 0.2s ease; max-width: 80px; cursor: pointer; }
   .nav-item svg { width: 22px; height: 22px; stroke: currentColor; stroke-width: 2; fill: none; transition: transform 0.2s ease; }
@@ -244,52 +238,31 @@
 
 <main id="scroller">
 
-  <!-- ================= HOME PAGE ================= -->
-  <section class="view" id="view-home">
+  <!-- ================= HOME PAGE (DEFAULT) ================= -->
+  <section class="view active" id="view-home">
     <div class="page-title">FREE PICKS</div>
     <div class="page-sub">Three handpicked singles · 1 unit each</div>
 
-    <!-- Tip 1 -->
     <div class="tip-card">
-      <div class="tip-header">
-        <span class="tip-league">Premier League</span>
-        <span class="tip-time">20:00</span>
-      </div>
+      <div class="tip-header"><span class="tip-league">Premier League</span><span class="tip-time">20:00</span></div>
       <div class="tip-match">Arsenal vs Chelsea</div>
-      <div class="tip-row">
-        <span class="tip-pick">Over 2.5 Goals</span>
-        <span class="tip-odds">1.85</span>
-      </div>
+      <div class="tip-row"><span class="tip-pick">Over 2.5 Goals</span><span class="tip-odds">1.85</span></div>
       <div class="conf-bar"><div class="conf-fill" style="width: 78%;"></div></div>
       <div class="conf-meta"><span>Tip 1 of 3 · 78% confidence</span><span>Single · 1u</span></div>
     </div>
 
-    <!-- Tip 2 -->
     <div class="tip-card">
-      <div class="tip-header">
-        <span class="tip-league">La Liga</span>
-        <span class="tip-time">21:00</span>
-      </div>
+      <div class="tip-header"><span class="tip-league">La Liga</span><span class="tip-time">21:00</span></div>
       <div class="tip-match">Real Madrid vs Getafe</div>
-      <div class="tip-row">
-        <span class="tip-pick">Real Madrid -1.5 AH</span>
-        <span class="tip-odds">1.72</span>
-      </div>
+      <div class="tip-row"><span class="tip-pick">Real Madrid -1.5 AH</span><span class="tip-odds">1.72</span></div>
       <div class="conf-bar"><div class="conf-fill" style="width: 74%;"></div></div>
       <div class="conf-meta"><span>Tip 2 of 3 · 74% confidence</span><span>Single · 1u</span></div>
     </div>
 
-    <!-- Tip 3 -->
     <div class="tip-card">
-      <div class="tip-header">
-        <span class="tip-league">Serie A</span>
-        <span class="tip-time">21:45</span>
-      </div>
+      <div class="tip-header"><span class="tip-league">Serie A</span><span class="tip-time">21:45</span></div>
       <div class="tip-match">Inter vs Milan</div>
-      <div class="tip-row">
-        <span class="tip-pick">Inter to Win</span>
-        <span class="tip-odds">1.95</span>
-      </div>
+      <div class="tip-row"><span class="tip-pick">Inter to Win</span><span class="tip-odds">1.95</span></div>
       <div class="conf-bar"><div class="conf-fill" style="width: 71%;"></div></div>
       <div class="conf-meta"><span>Tip 3 of 3 · 71% confidence</span><span>Single · 1u</span></div>
     </div>
@@ -298,7 +271,7 @@
   </section>
 
   <!-- ================= RESULTS PAGE ================= -->
-  <section class="view active" id="view-results">
+  <section class="view" id="view-results">
     <div class="header-section">
       <div class="main-heading">RESULTS</div>
       <div class="date-heading" id="uiDate">3 NOVEMBER 2026</div>
@@ -308,9 +281,7 @@
           <circle class="progress-ring__circle-bg" stroke-width="10" fill="transparent" r="45" cx="55" cy="55"/>
           <circle class="progress-ring__circle" stroke-width="10" fill="transparent" r="45" cx="55" cy="55" id="chartCircle"/>
         </svg>
-        <div class="chart-text">
-          <span id="uiHitRate">100%</span>
-        </div>
+        <div class="chart-text"><span id="uiHitRate">100%</span></div>
       </div>
       <div class="summary-heading" id="uiCategories">3/3 Categories Won</div>
     </div>
@@ -321,7 +292,7 @@
       <button class="top-tab" onclick="setTab(2)">3 ODDS</button>
     </div>
 
-    <div class="slider-container" id="sliderContainer">
+    <div class="slider-container slider-results" id="sliderContainer">
       <div class="card prev" onclick="setTab(0)">
         <div class="card-status" id="status0"></div>
         <div class="legs-container" id="legs0"></div>
@@ -359,45 +330,61 @@
   <!-- ================= PREMIUM PAGE ================= -->
   <section class="view" id="view-premium">
     <div class="page-title">PREMIUM</div>
-    <div class="page-sub">Daily accumulators · posted on Telegram</div>
+    <div class="page-sub">Choose your plan · Cancel anytime</div>
 
-    <div class="premium-hero">
-      <div class="hero-icon">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M3 8l4.2 3.2L12 4.5l4.8 6.7L21 8l-1.7 10H4.7L3 8z"/><path d="M4.7 21h14.6"/>
-        </svg>
+    <!-- Premium Slider (Same mechanism as results) -->
+    <div class="slider-container slider-premium" id="premiumSliderContainer">
+      
+      <!-- Free Plan -->
+      <div class="pricing-card prev" onclick="setPremiumTab(0)">
+        <div class="p-tier">Free</div>
+        <div class="p-price">R0<span>/mo</span></div>
+        <div class="p-desc">Start compounding with our free daily singles.</div>
+        <ul class="p-features">
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg> 3 Free Single Tips Daily</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg> Full Results History</li>
+        </ul>
+        <button class="p-btn outline">Current Plan</button>
       </div>
-      <h2>Inner Circle</h2>
-      <p>High-confidence 2 and 3 odds slips, posted daily to our private Telegram group.</p>
-      <button class="btn-cta" onclick="alert('Redirecting to Telegram...')">
-        Open Telegram Group
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width:18px; height:18px;"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
-      </button>
+
+      <!-- 2 Odds Plan -->
+      <div class="pricing-card featured active" onclick="setPremiumTab(1)">
+        <div class="featured-badge">Most Popular</div>
+        <div class="p-tier">2 Odds</div>
+        <div class="p-price">R550<span>/mo</span></div>
+        <div class="p-desc">Daily high-confidence 2-leg accumulator.</div>
+        <ul class="p-features">
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg> Daily 2 Odds Slip</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg> Private Telegram Group</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg> Instant Notifications</li>
+        </ul>
+        <button class="p-btn solid" onclick="alert('Redirecting to Telegram to pay R550...')">Join 2 Odds</button>
+      </div>
+
+      <!-- 3 Odds Plan -->
+      <div class="pricing-card next" onclick="setPremiumTab(2)">
+        <div class="p-tier">3 Odds</div>
+        <div class="p-price">R350<span>/mo</span></div>
+        <div class="p-desc">Daily 3-leg accumulator for higher returns.</div>
+        <ul class="p-features">
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg> Daily 3 Odds Slip</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg> Private Telegram Group</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg> Instant Notifications</li>
+        </ul>
+        <button class="p-btn outline" onclick="alert('Redirecting to Telegram to pay R350...')">Join 3 Odds</button>
+      </div>
+
     </div>
 
-    <div class="feature-list">
-      <div class="feature-item">
-        <div class="feature-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M2 12h20"/></svg></div>
-        <div class="feature-info">
-          <h4>Daily 2 Odds Slip</h4>
-          <p>Two-leg accumulator, ~2.00 combined</p>
-        </div>
-      </div>
-      <div class="feature-item">
-        <div class="feature-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></div>
-        <div class="feature-info">
-          <h4>Daily 3 Odds Slip</h4>
-          <p>Three-leg accumulator, ~3.00 combined</p>
-        </div>
-      </div>
-      <div class="feature-item">
-        <div class="feature-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a6 6 0 10-12 0c0 7-3 8-3 8h18s-3-1-3-8"/><path d="M10.3 21a2 2 0 003.4 0"/></svg></div>
-        <div class="feature-info">
-          <h4>Instant Notifications</h4>
-          <p>Get tips the moment they're posted</p>
-        </div>
+    <div class="controls-row" style="justify-content: center;">
+      <div class="nav-dots" id="premiumDots">
+        <div class="dot" onclick="setPremiumTab(0)"></div>
+        <div class="dot active" onclick="setPremiumTab(1)"></div>
+        <div class="dot" onclick="setPremiumTab(2)"></div>
       </div>
     </div>
+
+    <div class="footer-text" style="margin-top: 10px;">Subscriptions are handled securely via Telegram.</div>
   </section>
 
   <!-- ================= SETTINGS PAGE ================= -->
@@ -408,44 +395,25 @@
     <div class="settings-list">
       <div class="settings-item" onclick="window.location.reload()">
         <div class="settings-left">
-          <div class="settings-icon">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 2v6h-6"></path><path d="M3 12a9 9 0 1 0 2.13-5.88L21 8"></path></svg>
-          </div>
-          <div class="settings-text">
-            <h4>Refresh App</h4>
-            <p>Force reload the latest tips</p>
-          </div>
+          <div class="settings-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 2v6h-6"></path><path d="M3 12a9 9 0 1 0 2.13-5.88L21 8"></path></svg></div>
+          <div class="settings-text"><h4>Refresh App</h4><p>Force reload the latest tips</p></div>
         </div>
-        <div class="settings-right">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg>
-        </div>
+        <div class="settings-right"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg></div>
       </div>
 
       <div class="settings-item">
         <div class="settings-left">
-          <div class="settings-icon">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
-          </div>
-          <div class="settings-text">
-            <h4>App Version</h4>
-            <p>Trio v2.5</p>
-          </div>
+          <div class="settings-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg></div>
+          <div class="settings-text"><h4>App Version</h4><p>Trio v3.0</p></div>
         </div>
       </div>
 
       <div class="settings-item" onclick="alert('Opening Chat...')">
         <div class="settings-left">
-          <div class="settings-icon">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
-          </div>
-          <div class="settings-text">
-            <h4>Contact Support</h4>
-            <p>Chat directly with the team</p>
-          </div>
+          <div class="settings-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg></div>
+          <div class="settings-text"><h4>Contact Support</h4><p>Chat directly with the team</p></div>
         </div>
-        <div class="settings-right">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg>
-        </div>
+        <div class="settings-right"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg></div>
       </div>
     </div>
   </section>
@@ -455,11 +423,11 @@
 <!-- FLOATING BOTTOM NAV -->
 <nav class="bottomnav">
   <div class="bottomnav-inner">
-    <div class="nav-item" onclick="showAppView('home')">
+    <div class="nav-item active" onclick="showAppView('home')">
       <svg viewBox="0 0 24 24"><path d="M3 10.5L12 3l9 7.5V20a2 2 0 01-2 2h-4v-7h-6v7H5a2 2 0 01-2-2v-9.5z"/></svg>
       <span>Home</span>
     </div>
-    <div class="nav-item active" onclick="showAppView('results')">
+    <div class="nav-item" onclick="showAppView('results')">
       <svg viewBox="0 0 24 24"><path d="M3 20.5h18"/><path d="M6.5 20.5V14M12 20.5V7.5M17.5 20.5v-9"/></svg>
       <span>Results</span>
     </div>
@@ -476,7 +444,7 @@
 
 <script>
   // ==========================================
-  // MOCK DATA
+  // MOCK DATA FOR RESULTS
   // ==========================================
   const db = [
     {
@@ -505,13 +473,13 @@
     }
   ];
 
+  // --- RESULTS STATE ---
   let currentCardIndex = 1;
   let currentDayIndex = 0;
   const totalCards = 3;
   let autoScrollTimer;
-  
-  const cards = document.querySelectorAll('.card');
-  const dots = document.querySelectorAll('.dot');
+  const cards = document.querySelectorAll('#view-results .card');
+  const dots = document.querySelectorAll('#view-results .dot');
   const topTabs = document.querySelectorAll('.top-tab');
   const sliderContainer = document.getElementById('sliderContainer');
   
@@ -522,7 +490,6 @@
   circle.style.strokeDasharray = `${circumference} ${circumference}`;
   circle.style.strokeDashoffset = circumference;
 
-  // --- AUTO SCROLL ---
   function startAutoScroll() {
     clearInterval(autoScrollTimer);
     autoScrollTimer = setInterval(() => {
@@ -539,22 +506,18 @@
     startAutoScroll();
   }
 
-  // --- CARD & TAB NAVIGATION ---
   function goToSlide(index) {
     currentCardIndex = index;
-
     cards.forEach((card, i) => {
       card.classList.remove('active', 'prev', 'next');
       if (i === currentCardIndex) { card.classList.add('active'); } 
       else if (i === (currentCardIndex - 1 + totalCards) % totalCards) { card.classList.add('prev'); } 
       else { card.classList.add('next'); }
     });
-
     dots.forEach((dot, i) => dot.classList.toggle('active', i === currentCardIndex));
     topTabs.forEach((tab, i) => tab.classList.toggle('active', i === currentCardIndex));
   }
 
-  // --- DAY NAVIGATION & CONTENT RENDERING ---
   function changeDay(direction) {
     currentDayIndex += direction;
     if (currentDayIndex < 0) currentDayIndex = db.length - 1;
@@ -567,7 +530,6 @@
 
   function updateDayContent() {
     const dayData = db[currentDayIndex];
-    
     document.getElementById('uiDate').textContent = dayData.date;
     document.getElementById('uiCategories').textContent = `${dayData.categoriesWon}/3 Categories Won`;
     document.getElementById('uiHitRate').textContent = `${dayData.hitRate}%`;
@@ -593,43 +555,79 @@
           </div>
         </div>
       `).join('');
-      
       document.getElementById(`odds${i}`).textContent = cardData.totalOdds.toFixed(2);
     });
   }
 
-  // --- TOUCH SWIPE LOGIC ---
-  let touchStartX = 0;
-  let touchEndX = 0;
-
-  sliderContainer.addEventListener('touchstart', e => {
-    touchStartX = e.changedTouches[0].screenX;
-    stopAutoScroll(); 
-  }, { passive: true });
-
+  // Results Swipe Logic
+  let resTouchStartX = 0;
+  let resTouchEndX = 0;
+  sliderContainer.addEventListener('touchstart', e => { resTouchStartX = e.changedTouches[0].screenX; stopAutoScroll(); }, { passive: true });
   sliderContainer.addEventListener('touchend', e => {
-    touchEndX = e.changedTouches[0].screenX;
-    handleSwipe();
+    resTouchEndX = e.changedTouches[0].screenX;
+    const threshold = 50;
+    if (resTouchStartX - resTouchEndX > threshold) setTab((currentCardIndex + 1) % totalCards);
+    else if (resTouchEndX - resTouchStartX > threshold) setTab((currentCardIndex - 1 + totalCards) % totalCards);
     startAutoScroll();
   }, { passive: true });
 
-  function handleSwipe() {
-    const swipeThreshold = 50;
-    if (touchStartX - touchEndX > swipeThreshold) {
-      setTab((currentCardIndex + 1) % totalCards);
-    } else if (touchEndX - touchStartX > swipeThreshold) {
-      setTab((currentCardIndex - 1 + totalCards) % totalCards);
-    }
+
+  // ==========================================
+  // PREMIUM SLIDER LOGIC (Mirrors Results)
+  // ==========================================
+  let currentPremiumIndex = 1; // Start on middle card
+  const premiumCards = document.querySelectorAll('#view-premium .pricing-card');
+  const premiumDots = document.querySelectorAll('#premiumDots .dot');
+  const premiumContainer = document.getElementById('premiumSliderContainer');
+  let autoScrollPremiumTimer;
+
+  function startAutoScrollPremium() {
+    clearInterval(autoScrollPremiumTimer);
+    autoScrollPremiumTimer = setInterval(() => {
+      let nextIndex = (currentPremiumIndex + 1) % totalCards;
+      setPremiumTab(nextIndex);
+    }, 5000);
   }
 
-  // --- APP NAVIGATION ---
+  function stopAutoScrollPremium() { clearInterval(autoScrollPremiumTimer); }
+
+  function setPremiumTab(index) {
+    stopAutoScrollPremium();
+    currentPremiumIndex = index;
+
+    premiumCards.forEach((card, i) => {
+      card.classList.remove('active', 'prev', 'next');
+      if (i === currentPremiumIndex) { card.classList.add('active'); } 
+      else if (i === (currentPremiumIndex - 1 + totalCards) % totalCards) { card.classList.add('prev'); } 
+      else { card.classList.add('next'); }
+    });
+
+    premiumDots.forEach((dot, i) => dot.classList.toggle('active', i === currentPremiumIndex));
+    startAutoScrollPremium();
+  }
+
+  // Premium Swipe Logic
+  let premTouchStartX = 0;
+  let premTouchEndX = 0;
+  premiumContainer.addEventListener('touchstart', e => { premTouchStartX = e.changedTouches[0].screenX; stopAutoScrollPremium(); }, { passive: true });
+  premiumContainer.addEventListener('touchend', e => {
+    premTouchEndX = e.changedTouches[0].screenX;
+    const threshold = 50;
+    if (premTouchStartX - premTouchEndX > threshold) setPremiumTab((currentPremiumIndex + 1) % totalCards);
+    else if (premTouchEndX - premTouchStartX > threshold) setPremiumTab((currentPremiumIndex - 1 + totalCards) % totalCards);
+    else startAutoScrollPremium(); // Resume if it was just a tap
+  }, { passive: true });
+
+
+  // ==========================================
+  // APP NAVIGATION
+  // ==========================================
   function showAppView(viewName) {
     document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
     document.getElementById(`view-${viewName}`).classList.add('active');
     
     document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
     
-    // Find the specific nav item that was clicked and activate it
     const navItems = document.querySelectorAll('.nav-item');
     navItems.forEach(item => {
       const iconPath = item.querySelector('svg path').getAttribute('d');
@@ -643,18 +641,20 @@
       }
     });
 
-    // Pause auto-scroll when leaving results
-    if (viewName !== 'results') {
-      stopAutoScroll();
-    } else {
-      startAutoScroll();
-    }
+    // Handle Auto-Scroll states
+    if (viewName === 'results') { startAutoScroll(); } else { stopAutoScroll(); }
+    if (viewName === 'premium') { startAutoScrollPremium(); } else { stopAutoScrollPremium(); }
   }
 
   // Initialize
   goToSlide(1);
   updateDayContent();
-  startAutoScroll();
+  
+  setPremiumTab(1);
+  
+  // Start timers only on active view (Home by default, so timers are paused)
+  stopAutoScroll();
+  stopAutoScrollPremium();
 </script>
 
 </body>
