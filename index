@@ -1,0 +1,769 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<meta name="theme-color" content="#f4f5f7">
+<title>Trio — 3 Free Tips a Day</title>
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800;900&family=Barlow:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#f4f5f7;
+    --surface:rgba(255,255,255,0.78);
+    --surface-2:rgba(15,23,42,0.045);
+    --border:rgba(15,23,42,0.08);
+    --border-strong:rgba(15,23,42,0.12);
+    --text:#0f172a;
+    --muted:#64748b;
+    --dim:#94a3b8;
+    --accent:#ff5f2e;
+    --accent-2:#ff8a3d;
+    --accent-soft:rgba(255,95,46,0.10);
+    --win:#059669;
+    --win-soft:rgba(5,150,105,0.11);
+    --loss:#dc2626;
+    --loss-soft:rgba(220,38,38,0.10);
+    --premium:#7c3aed;
+    --premium-soft:rgba(124,58,237,0.10);
+    --radius:20px;
+    --top-h:60px;
+    --bottom-h:72px;
+    --font-body:'Barlow',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;
+    --font-display:'Barlow Condensed','Barlow',-apple-system,sans-serif;
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+  html,body{margin:0;height:100%;}
+  body{
+    font-family:var(--font-body);font-weight:600;
+    background:var(--bg);color:var(--text);
+    -webkit-font-smoothing:antialiased;overflow:hidden;
+  }
+  button{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:pointer;}
+  svg{display:block;}
+
+  /* ============ BACKGROUND ============ */
+  .bg-deco{position:fixed;inset:0;z-index:-1;overflow:hidden;pointer-events:none;background:var(--bg);}
+  .blob{position:absolute;border-radius:50%;filter:blur(100px);}
+  .b1{width:380px;height:380px;background:radial-gradient(circle,#ffc4a8 0%,transparent 70%);top:-120px;left:-120px;opacity:0.75;}
+  .b2{width:420px;height:420px;background:radial-gradient(circle,#ddd0fc 0%,transparent 70%);top:35%;right:-180px;opacity:0.65;}
+  .b3{width:320px;height:320px;background:radial-gradient(circle,#c7dcfb 0%,transparent 70%);bottom:-100px;left:15%;opacity:0.6;}
+  .grain{
+    position:absolute;inset:0;
+    background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    opacity:0.035;mix-blend-mode:multiply;
+  }
+
+  /* ============ TOP BAR ============ */
+  .topbar{
+    position:fixed;top:0;left:0;right:0;z-index:40;
+    padding:calc(env(safe-area-inset-top) + 12px) 16px 12px;
+    background:rgba(255,255,255,0.82);
+    backdrop-filter:blur(24px) saturate(180%);
+    -webkit-backdrop-filter:blur(24px) saturate(180%);
+    border-bottom:1px solid var(--border);
+    display:flex;align-items:center;justify-content:space-between;gap:12px;
+  }
+  .brand{display:flex;align-items:center;gap:10px;min-width:0;}
+  .logo{
+    width:36px;height:36px;flex:0 0 36px;border-radius:12px;
+    background:linear-gradient(150deg,var(--accent),var(--accent-2));
+    display:flex;align-items:center;justify-content:center;
+    box-shadow:0 6px 14px rgba(255,95,46,0.28);
+  }
+  .logo svg{width:20px;height:20px;color:#fff;}
+  .brand b{display:block;font-family:var(--font-display);font-size:19px;font-weight:900;letter-spacing:0.3px;line-height:1;}
+  .brand span{display:block;font-family:var(--font-body);font-size:10.5px;color:var(--muted);font-weight:600;letter-spacing:0.3px;margin-top:3px;}
+  .top-actions{display:flex;gap:8px;align-items:center;}
+  .icon-btn{
+    width:38px;height:38px;border-radius:12px;
+    display:flex;align-items:center;justify-content:center;
+    background:rgba(255,255,255,0.7);
+    border:1px solid var(--border);
+    color:var(--text);transition:background .15s ease,transform .1s ease;
+  }
+  .icon-btn:active{background:rgba(255,255,255,0.95);transform:scale(0.95);}
+  .icon-btn svg{width:18px;height:18px;}
+
+  /* ============ SCROLLER ============ */
+  #scroller{
+    position:fixed;inset:0;overflow-y:auto;-webkit-overflow-scrolling:touch;
+    overscroll-behavior:contain;
+    padding-top:calc(var(--top-h) + env(safe-area-inset-top) + 18px);
+    padding-bottom:calc(var(--bottom-h) + env(safe-area-inset-bottom) + 24px);
+  }
+  .view{display:none;padding:0 20px;max-width:640px;margin:0 auto;animation:fade .22s ease;}
+  .view.active{display:block;}
+  @keyframes fade{from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:none;}}
+  .page-title{font-family:var(--font-display);font-size:32px;font-weight:900;letter-spacing:0.2px;line-height:1;margin:0 0 6px;text-transform:uppercase;}
+  .page-sub{font-family:var(--font-body);font-size:13px;color:var(--muted);font-weight:600;margin:0 0 22px;letter-spacing:0.2px;}
+  .section-h{font-family:var(--font-display);font-size:14px;font-weight:800;letter-spacing:1.2px;text-transform:uppercase;color:var(--muted);margin:26px 0 12px 2px;}
+
+  /* ============ TIP CARD ============ */
+  .tip{
+    position:relative;
+    background:var(--surface);
+    backdrop-filter:blur(24px) saturate(180%);
+    -webkit-backdrop-filter:blur(24px) saturate(180%);
+    border:1px solid rgba(255,255,255,0.95);
+    border-radius:var(--radius);
+    padding:18px;margin-bottom:12px;
+    box-shadow:0 6px 20px rgba(15,23,42,0.06);
+  }
+  .tip-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:12px;}
+  .tag{
+    font-family:var(--font-display);font-size:11.5px;font-weight:800;letter-spacing:0.6px;text-transform:uppercase;
+    color:var(--accent);background:var(--accent-soft);
+    padding:4px 10px;border-radius:6px;
+  }
+  .time{font-family:var(--font-display);font-size:14px;font-weight:700;color:var(--muted);letter-spacing:0.4px;}
+  .match{font-family:var(--font-display);font-size:22px;font-weight:800;letter-spacing:0.2px;margin:0 0 14px;line-height:1.15;text-transform:uppercase;}
+  .pick-row{display:flex;align-items:center;justify-content:space-between;gap:12px;}
+  .pick{font-family:var(--font-body);font-size:14px;font-weight:700;color:var(--text);letter-spacing:0.1px;}
+  .odds{
+    font-family:var(--font-display);font-size:17px;font-weight:800;color:var(--text);letter-spacing:0.4px;
+    background:var(--surface-2);border:1px solid var(--border);
+    padding:5px 11px;border-radius:8px;flex:0 0 auto;
+  }
+  .conf{height:5px;border-radius:99px;background:rgba(15,23,42,0.06);overflow:hidden;margin-top:16px;}
+  .conf i{display:block;height:100%;border-radius:99px;background:linear-gradient(90deg,var(--accent),#ffb37a);}
+  .conf-meta{display:flex;justify-content:space-between;font-size:11px;font-weight:600;color:var(--muted);margin-top:8px;letter-spacing:0.2px;}
+
+  /* ============ SEGMENTED ============ */
+  .segmented{
+    display:flex;gap:4px;padding:5px;margin-bottom:18px;
+    background:var(--surface);
+    backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
+    border:1px solid rgba(255,255,255,0.95);border-radius:14px;
+    box-shadow:0 4px 14px rgba(15,23,42,0.05);
+  }
+  .segmented button{
+    flex:1;padding:11px 8px;border-radius:10px;
+    font-family:var(--font-display);font-size:14px;font-weight:800;letter-spacing:0.6px;text-transform:uppercase;
+    color:var(--muted);transition:background .2s,color .2s;
+  }
+  .segmented button.active{background:var(--text);color:#fff;}
+
+  /* ============ STATS ============ */
+  .stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:18px;}
+  .stat{
+    background:var(--surface);
+    backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
+    border:1px solid rgba(255,255,255,0.95);border-radius:14px;
+    padding:14px 6px;text-align:center;
+    box-shadow:0 4px 14px rgba(15,23,42,0.05);
+  }
+  .stat b{display:block;font-family:var(--font-display);font-size:26px;font-weight:900;letter-spacing:0.3px;color:var(--accent);line-height:1;}
+  .stat span{display:block;font-size:10.5px;font-weight:700;color:var(--muted);margin-top:6px;letter-spacing:0.3px;text-transform:uppercase;}
+
+  /* ============ RESULTS SLIDER ============ */
+  .res-slider{
+    display:flex;overflow-x:auto;scroll-snap-type:x mandatory;
+    scrollbar-width:none;gap:12px;padding-bottom:4px;
+    -webkit-overflow-scrolling:touch;
+  }
+  .res-slider::-webkit-scrollbar{display:none;}
+  .res-slider .day{
+    flex:0 0 calc(100% - 24px);
+    scroll-snap-align:start;
+    background:var(--surface);
+    backdrop-filter:blur(24px) saturate(180%);
+    -webkit-backdrop-filter:blur(24px) saturate(180%);
+    border:1px solid rgba(255,255,255,0.95);border-radius:var(--radius);
+    padding:16px 18px;
+    box-shadow:0 6px 20px rgba(15,23,42,0.06);
+  }
+  .res-dots{display:flex;justify-content:center;gap:6px;margin:16px 0 18px;}
+  .res-dots .dot{
+    width:6px;height:6px;border-radius:50%;
+    background:rgba(15,23,42,0.18);transition:all .25s ease;
+  }
+  .res-dots .dot.active{width:22px;border-radius:3px;background:var(--accent);}
+
+  .day-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:6px;}
+  .day-date{font-family:var(--font-display);font-size:20px;font-weight:800;letter-spacing:0.4px;text-transform:uppercase;line-height:1;}
+  .badge{font-family:var(--font-display);font-size:12px;font-weight:800;padding:5px 10px;border-radius:7px;letter-spacing:0.5px;text-transform:uppercase;}
+  .badge.win{color:var(--win);background:var(--win-soft);}
+  .badge.loss{color:var(--loss);background:var(--loss-soft);}
+  .badge.mixed{color:var(--accent);background:var(--accent-soft);}
+
+  .leg{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 0;border-top:1px solid var(--border);}
+  .leg:first-of-type{margin-top:10px;}
+  .leg-info{min-width:0;}
+  .lm{font-family:var(--font-display);font-size:15px;font-weight:800;letter-spacing:0.2px;margin-bottom:3px;text-transform:uppercase;}
+  .lt{font-size:11.5px;font-weight:600;color:var(--muted);letter-spacing:0.1px;}
+  .pill{
+    flex:0 0 auto;font-family:var(--font-display);font-size:13px;font-weight:800;letter-spacing:0.4px;
+    padding:5px 10px;border-radius:8px;display:flex;align-items:center;gap:5px;
+  }
+  .pill.win{color:var(--win);background:var(--win-soft);}
+  .pill.loss{color:var(--loss);background:var(--loss-soft);}
+  .pill svg{width:11px;height:11px;}
+
+  .slip-total{
+    display:flex;align-items:center;justify-content:space-between;
+    margin-top:8px;padding-top:14px;border-top:1px solid var(--border);
+    font-size:11.5px;font-weight:700;color:var(--muted);letter-spacing:0.3px;text-transform:uppercase;
+  }
+  .slip-total b{font-family:var(--font-display);color:var(--accent);font-size:24px;font-weight:900;letter-spacing:0.3px;line-height:1;}
+
+  /* ============ PREMIUM ============ */
+  .premium-hero{
+    position:relative;overflow:hidden;
+    background:linear-gradient(155deg,rgba(124,58,237,0.10) 0%,rgba(255,95,46,0.08) 55%,rgba(255,255,255,0.72) 100%);
+    backdrop-filter:blur(24px) saturate(180%);
+    -webkit-backdrop-filter:blur(24px) saturate(180%);
+    border:1px solid rgba(124,58,237,0.20);border-radius:var(--radius);
+    padding:28px 22px;margin-bottom:16px;text-align:center;
+    box-shadow:0 10px 28px rgba(124,58,237,0.10);
+  }
+  .crown-badge{
+    width:60px;height:60px;margin:0 auto 16px;border-radius:20px;
+    background:linear-gradient(150deg,var(--premium),#a78bfa);
+    display:flex;align-items:center;justify-content:center;
+    box-shadow:0 8px 20px rgba(124,58,237,0.30);
+  }
+  .crown-badge svg{width:30px;height:30px;color:#fff;}
+  .premium-hero h2{font-family:var(--font-display);font-size:28px;font-weight:900;letter-spacing:0.3px;margin:0 0 8px;text-transform:uppercase;line-height:1;}
+  .premium-hero p{font-size:13px;line-height:1.5;color:var(--muted);font-weight:600;margin:0 0 20px;}
+  .btn-primary{
+    display:inline-flex;align-items:center;justify-content:center;gap:8px;width:100%;
+    background:linear-gradient(150deg,var(--accent),var(--accent-2));
+    color:#fff;font-family:var(--font-display);font-size:17px;font-weight:800;letter-spacing:0.6px;text-transform:uppercase;
+    padding:16px;border-radius:14px;
+    box-shadow:0 8px 20px rgba(255,95,46,0.28);
+    transition:transform .15s ease;
+  }
+  .btn-primary:active{transform:scale(0.98);}
+  .btn-primary svg{width:18px;height:18px;}
+
+  .features{display:grid;gap:10px;}
+  .feature{
+    display:flex;align-items:flex-start;gap:14px;
+    background:var(--surface);
+    backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
+    border:1px solid rgba(255,255,255,0.95);border-radius:16px;
+    padding:16px;box-shadow:0 4px 14px rgba(15,23,42,0.05);
+  }
+  .f-icon{
+    width:38px;height:38px;flex:0 0 38px;border-radius:11px;
+    display:flex;align-items:center;justify-content:center;
+    background:var(--premium-soft);color:var(--premium);
+  }
+  .f-icon svg{width:20px;height:20px;}
+  .feature div{min-width:0;}
+  .feature b{display:block;font-family:var(--font-display);font-size:16px;font-weight:800;margin-bottom:3px;letter-spacing:0.2px;text-transform:uppercase;line-height:1.1;}
+  .feature span{display:block;font-size:12px;font-weight:600;color:var(--muted);line-height:1.5;}
+
+  /* ============ BOTTOM NAV ============ */
+  .bottomnav{
+    position:fixed;left:0;right:0;bottom:0;z-index:40;
+    padding-bottom:env(safe-area-inset-bottom);
+    background:rgba(255,255,255,0.85);
+    backdrop-filter:blur(28px) saturate(180%);
+    -webkit-backdrop-filter:blur(28px) saturate(180%);
+    border-top:1px solid var(--border);
+    box-shadow:0 -6px 22px rgba(15,23,42,0.06);
+  }
+  .bottomnav-inner{
+    height:var(--bottom-h);display:grid;grid-template-columns:repeat(3,1fr);
+    padding:0 10px;max-width:640px;margin:0 auto;
+  }
+  .nav-item{
+    display:flex;flex-direction:column;align-items:center;justify-content:center;
+    gap:4px;color:var(--dim);position:relative;transition:color .2s ease;
+  }
+  .nav-item svg{width:23px;height:23px;transition:transform .2s ease;}
+  .nav-item span{font-family:var(--font-display);font-size:12px;font-weight:700;letter-spacing:0.5px;text-transform:uppercase;}
+  .nav-item.active{color:var(--accent);}
+  .nav-item.active svg{transform:translateY(-2px);}
+  .nav-item.active span{font-weight:900;}
+
+  /* ============ NOTE ============ */
+  .note{
+    margin:24px 0 0;padding:14px 16px;
+    background:rgba(255,255,255,0.55);border:1px solid var(--border);
+    border-radius:14px;font-size:11.5px;line-height:1.6;
+    font-weight:600;color:var(--muted);text-align:center;letter-spacing:0.2px;
+  }
+  .note b{color:var(--text);font-weight:700;}
+
+  /* ============ MODAL ============ */
+  .modal-overlay{
+    position:fixed;inset:0;z-index:100;
+    background:rgba(15,23,42,0.45);
+    opacity:0;pointer-events:none;
+    transition:opacity .25s ease;
+    display:flex;align-items:flex-end;justify-content:center;
+    backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);
+  }
+  .modal-overlay.open{opacity:1;pointer-events:auto;}
+  .modal-sheet{
+    width:100%;max-width:480px;
+    background:#fff;border-radius:24px 24px 0 0;
+    padding:12px 24px calc(28px + env(safe-area-inset-bottom));
+    transform:translateY(100%);
+    transition:transform .3s cubic-bezier(0.32,0.72,0,1);
+    box-shadow:0 -8px 32px rgba(15,23,42,0.18);
+  }
+  .modal-overlay.open .modal-sheet{transform:translateY(0);}
+  .sheet-grip{width:36px;height:4px;border-radius:99px;background:rgba(15,23,42,0.15);margin:0 auto 20px;}
+  .modal-sheet h2{font-family:var(--font-display);font-size:26px;font-weight:900;letter-spacing:0.3px;margin:0 0 12px;text-transform:uppercase;line-height:1;}
+  .modal-sheet p{font-size:14px;line-height:1.6;color:var(--muted);font-weight:600;margin:0 0 14px;}
+  .modal-sheet .note{margin:14px 0 20px;}
+</style>
+</head>
+<body>
+
+<div class="bg-deco">
+  <div class="blob b1"></div>
+  <div class="blob b2"></div>
+  <div class="blob b3"></div>
+  <div class="grain"></div>
+</div>
+
+<header class="topbar">
+  <div class="brand">
+    <span class="logo">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M4 16.5l5.2-5.2 3 3L20 6.5"/><path d="M15.5 6.5H20v4.5"/>
+      </svg>
+    </span>
+    <div>
+      <b>TRIO</b>
+      <span>3 free tips · daily</span>
+    </div>
+  </div>
+  <div class="top-actions">
+    <button class="icon-btn" onclick="openInfo()" aria-label="Info">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/>
+      </svg>
+    </button>
+    <button class="icon-btn" onclick="openChat()" aria-label="Chat">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/>
+      </svg>
+    </button>
+  </div>
+</header>
+
+<main id="scroller">
+
+  <!-- HOME -->
+  <section class="view active" id="view-home">
+    <h1 class="page-title">Free Picks</h1>
+    <p class="page-sub">Three handpicked singles · 1 unit each</p>
+    <div id="homeList"></div>
+    <div class="note"><b>Free forever.</b> Betting involves risk — only stake what you can afford to lose. 18+</div>
+  </section>
+
+  <!-- RESULTS -->
+  <section class="view" id="view-results">
+    <h1 class="page-title">Results</h1>
+    <p class="page-sub">Last 7 days · swipe to browse</p>
+
+    <div class="segmented" id="resTabs">
+      <button class="active" data-cat="free">Free</button>
+      <button data-cat="twoOdds">2 Odds</button>
+      <button data-cat="threeOdds">3 Odds</button>
+    </div>
+
+    <div class="stats" id="stats"></div>
+
+    <div class="res-slider" id="resSlider"></div>
+    <div class="res-dots" id="resDots"></div>
+
+    <div class="note">Past results don't guarantee future returns. 18+</div>
+  </section>
+
+  <!-- PREMIUM -->
+  <section class="view" id="view-premium">
+    <h1 class="page-title">Premium</h1>
+    <p class="page-sub">Daily accumulators · posted on Telegram</p>
+
+    <div class="premium-hero">
+      <div class="crown-badge">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M3 8l4.2 3.2L12 4.5l4.8 6.7L21 8l-1.7 10H4.7L3 8z"/><path d="M4.7 21h14.6"/>
+        </svg>
+      </div>
+      <h2>Inner Circle</h2>
+      <p>High-confidence 2 and 3 odds slips, posted daily to our private Telegram group.</p>
+      <button class="btn-primary" onclick="openPremium()">
+        Open Telegram Group
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+      </button>
+    </div>
+
+    <h3 class="section-h">What members get</h3>
+    <div class="features">
+      <div class="feature">
+        <div class="f-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M2 12h20"/></svg></div>
+        <div><b>Daily 2 Odds slip</b><span>Two-leg accumulator, ~2.00 combined</span></div>
+      </div>
+      <div class="feature">
+        <div class="f-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></div>
+        <div><b>Daily 3 Odds slip</b><span>Three-leg accumulator, ~3.00 combined</span></div>
+      </div>
+      <div class="feature">
+        <div class="f-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a6 6 0 10-12 0c0 7-3 8-3 8h18s-3-1-3-8"/><path d="M10.3 21a2 2 0 003.4 0"/></svg></div>
+        <div><b>Instant notifications</b><span>Get tips the moment they're posted</span></div>
+      </div>
+      <div class="feature">
+        <div class="f-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg></div>
+        <div><b>Private community</b><span>Discuss picks with serious bettors</span></div>
+      </div>
+    </div>
+
+    <div class="note">Subscription handled inside the Telegram group. 18+</div>
+  </section>
+
+</main>
+
+<nav class="bottomnav">
+  <div class="bottomnav-inner">
+    <button class="nav-item active" data-view="home">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.5L12 3l9 7.5V20a2 2 0 01-2 2h-4v-7h-6v7H5a2 2 0 01-2-2v-9.5z"/></svg>
+      <span>Home</span>
+    </button>
+    <button class="nav-item" data-view="results">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 20.5h18"/><path d="M6.5 20.5V14M12 20.5V7.5M17.5 20.5v-9"/></svg>
+      <span>Results</span>
+    </button>
+    <button class="nav-item" data-view="premium">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8l4.2 3.2L12 4.5l4.8 6.7L21 8l-1.7 10H4.7L3 8z"/><path d="M4.7 21h14.6"/></svg>
+      <span>Premium</span>
+    </button>
+  </div>
+</nav>
+
+<!-- INFO MODAL -->
+<div class="modal-overlay" id="infoOverlay" onclick="handleInfoBackdrop(event)">
+  <div class="modal-sheet" onclick="event.stopPropagation()">
+    <div class="sheet-grip"></div>
+    <h2>About Trio</h2>
+    <p>Trio delivers <b>3 free single betting tips every day</b> — carefully researched, one unit each. No charge, no sign-up, no hidden pitches.</p>
+    <p>For our premium 2 and 3 odds accumulators, tap the Premium tab.</p>
+    <div class="note"><b>Responsible gambling.</b> Betting involves risk. Only stake what you can afford to lose. Past results do not guarantee future returns. 18+ only.</div>
+    <button class="btn-primary" onclick="closeInfo()">Got it</button>
+  </div>
+</div>
+
+<script>
+/* ============ TELEGRAM ============ */
+const tg = window.Telegram?.WebApp;
+if (tg) {
+  try {
+    tg.ready();
+    tg.expand();
+    tg.setHeaderColor('#f4f5f7');
+    tg.setBackgroundColor('#f4f5f7');
+    tg.disableVerticalSwipes?.();
+  } catch (e) {}
+}
+const haptic = (type = 'light') => {
+  try {
+    if (type === 'select') tg?.HapticFeedback?.selectionChanged();
+    else tg?.HapticFeedback?.impactOccurred(type);
+  } catch (e) {}
+};
+
+/* ============================================================
+   CONFIG — update these to your real Telegram links
+   ============================================================ */
+const PREMIUM_LINK = 'https://t.me/dailycompounderbot';
+const CHAT_LINK    = 'https://t.me/dailycompounderbot';
+
+/* ============ DATA ============ */
+const TODAY_TIPS = [
+  { league:'Premier League', time:'20:00', match:'Arsenal vs Chelsea',   tip:'Over 2.5 Goals',      odds:1.85, conf:78 },
+  { league:'La Liga',        time:'21:00', match:'Real Madrid vs Getafe', tip:'Real Madrid -1.5 AH', odds:1.72, conf:74 },
+  { league:'Serie A',        time:'21:45', match:'Inter vs Milan',        tip:'Inter to Win',        odds:1.95, conf:71 }
+];
+
+const RESULTS = [
+  { offset:1,
+    free:[
+      { match:'Arsenal vs Chelsea',    tip:'Over 2.5 Goals',      odds:1.85, score:'2-3', res:'win'  },
+      { match:'Real Madrid vs Getafe', tip:'Real Madrid -1.5 AH', odds:1.72, score:'3-0', res:'win'  },
+      { match:'Inter vs Milan',        tip:'Inter to Win',        odds:1.95, score:'2-0', res:'win'  }
+    ],
+    twoOdds:[
+      { match:'Arsenal vs Chelsea',    tip:'Over 2.5 Goals',      odds:1.85, score:'2-3', res:'win'  },
+      { match:'Real Madrid vs Getafe', tip:'Real Madrid -1.5 AH', odds:1.72, score:'3-0', res:'win'  }
+    ],
+    threeOdds:[
+      { match:'Arsenal vs Chelsea',    tip:'Over 2.5 Goals',      odds:1.85, score:'2-3', res:'win'  },
+      { match:'Real Madrid vs Getafe', tip:'Real Madrid -1.5 AH', odds:1.72, score:'3-0', res:'win'  },
+      { match:'Inter vs Milan',        tip:'Inter to Win',        odds:1.95, score:'2-0', res:'win'  }
+    ]
+  },
+  { offset:2,
+    free:[
+      { match:'Bayern vs Augsburg',    tip:'Bayern -1.5 AH',      odds:1.40, score:'2-1', res:'loss' },
+      { match:'PSG vs Nantes',         tip:'Over 2.5 Goals',      odds:1.50, score:'3-1', res:'win'  },
+      { match:'Dortmund vs Mainz',     tip:'BTTS Yes',            odds:1.54, score:'2-2', res:'win'  }
+    ],
+    twoOdds:[
+      { match:'PSG vs Nantes',         tip:'Over 2.5 Goals',      odds:1.50, score:'3-1', res:'win'  },
+      { match:'Dortmund vs Mainz',     tip:'BTTS Yes',            odds:1.54, score:'2-2', res:'win'  }
+    ],
+    threeOdds:[
+      { match:'Bayern vs Augsburg',    tip:'Bayern -1.5 AH',      odds:1.40, score:'2-1', res:'loss' },
+      { match:'PSG vs Nantes',         tip:'Over 2.5 Goals',      odds:1.50, score:'3-1', res:'win'  },
+      { match:'Dortmund vs Mainz',     tip:'BTTS Yes',            odds:1.54, score:'2-2', res:'win'  }
+    ]
+  },
+  { offset:3,
+    free:[
+      { match:'Barcelona vs Sevilla',  tip:'Barcelona to Win',    odds:1.62, score:'1-1', res:'loss' },
+      { match:'Napoli vs Roma',        tip:'Under 2.5 Goals',     odds:1.80, score:'0-1', res:'win'  },
+      { match:'Ajax vs Twente',        tip:'Ajax -1.5 AH',        odds:1.68, score:'1-0', res:'loss' }
+    ],
+    twoOdds:[
+      { match:'Napoli vs Roma',        tip:'Under 2.5 Goals',     odds:1.80, score:'0-1', res:'win'  },
+      { match:'Ajax vs Twente',        tip:'Ajax -1.5 AH',        odds:1.68, score:'1-0', res:'loss' }
+    ],
+    threeOdds:[
+      { match:'Barcelona vs Sevilla',  tip:'Barcelona to Win',    odds:1.62, score:'1-1', res:'loss' },
+      { match:'Napoli vs Roma',        tip:'Under 2.5 Goals',     odds:1.80, score:'0-1', res:'win'  },
+      { match:'Ajax vs Twente',        tip:'Ajax -1.5 AH',        odds:1.68, score:'1-0', res:'loss' }
+    ]
+  },
+  { offset:4,
+    free:[
+      { match:'Man City vs Brighton',   tip:'City to Win',         odds:1.45, score:'3-1', res:'win' },
+      { match:'Atletico vs Villarreal', tip:'Atletico Win or Draw',odds:1.33, score:'2-1', res:'win' },
+      { match:'Leverkusen vs Wolfsburg',tip:'Over 2.5 Goals',      odds:1.55, score:'3-2', res:'win' }
+    ],
+    twoOdds:[
+      { match:'Man City vs Brighton',   tip:'City to Win',         odds:1.45, score:'3-1', res:'win' },
+      { match:'Atletico vs Villarreal', tip:'Atletico Win or Draw',odds:1.33, score:'2-1', res:'win' }
+    ],
+    threeOdds:[
+      { match:'Man City vs Brighton',   tip:'City to Win',         odds:1.45, score:'3-1', res:'win' },
+      { match:'Atletico vs Villarreal', tip:'Atletico Win or Draw',odds:1.33, score:'2-1', res:'win' },
+      { match:'Leverkusen vs Wolfsburg',tip:'Over 2.5 Goals',      odds:1.55, score:'3-2', res:'win' }
+    ]
+  },
+  { offset:5,
+    free:[
+      { match:'Liverpool vs Everton', tip:'Liverpool -1.5 AH',   odds:1.75, score:'2-0', res:'win'  },
+      { match:'Juventus vs Lazio',    tip:'Under 2.5 Goals',     odds:1.70, score:'1-1', res:'win'  },
+      { match:'Benfica vs Porto',     tip:'BTTS Yes',            odds:1.66, score:'1-0', res:'loss' }
+    ],
+    twoOdds:[
+      { match:'Liverpool vs Everton', tip:'Liverpool -1.5 AH',   odds:1.75, score:'2-0', res:'win'  },
+      { match:'Juventus vs Lazio',    tip:'Under 2.5 Goals',     odds:1.70, score:'1-1', res:'win'  }
+    ],
+    threeOdds:[
+      { match:'Liverpool vs Everton', tip:'Liverpool -1.5 AH',   odds:1.75, score:'2-0', res:'win'  },
+      { match:'Juventus vs Lazio',    tip:'Under 2.5 Goals',     odds:1.70, score:'1-1', res:'win'  },
+      { match:'Benfica vs Porto',     tip:'BTTS Yes',            odds:1.66, score:'1-0', res:'loss' }
+    ]
+  },
+  { offset:6,
+    free:[
+      { match:'Tottenham vs Newcastle', tip:'Over 2.5 Goals',    odds:1.58, score:'1-4', res:'win'  },
+      { match:'Milan vs Atalanta',      tip:'Milan Win or Draw', odds:1.30, score:'2-1', res:'win'  },
+      { match:'Lyon vs Marseille',      tip:'Lyon to Win',       odds:2.10, score:'0-2', res:'loss' }
+    ],
+    twoOdds:[
+      { match:'Tottenham vs Newcastle', tip:'Over 2.5 Goals',    odds:1.58, score:'1-4', res:'win'  },
+      { match:'Milan vs Atalanta',      tip:'Milan Win or Draw', odds:1.30, score:'2-1', res:'win'  }
+    ],
+    threeOdds:[
+      { match:'Tottenham vs Newcastle', tip:'Over 2.5 Goals',    odds:1.58, score:'1-4', res:'win'  },
+      { match:'Milan vs Atalanta',      tip:'Milan Win or Draw', odds:1.30, score:'2-1', res:'win'  },
+      { match:'Lyon vs Marseille',      tip:'Lyon to Win',       odds:2.10, score:'0-2', res:'loss' }
+    ]
+  },
+  { offset:7,
+    free:[
+      { match:'Chelsea vs Fulham',      tip:'Chelsea to Win',    odds:1.65, score:'2-0', res:'win' },
+      { match:'Real Sociedad vs Betis', tip:'Over 1.5 Goals',    odds:1.35, score:'2-2', res:'win' },
+      { match:'Feyenoord vs AZ',        tip:'Feyenoord -1.5 AH', odds:1.80, score:'3-1', res:'win' }
+    ],
+    twoOdds:[
+      { match:'Chelsea vs Fulham',      tip:'Chelsea to Win',    odds:1.65, score:'2-0', res:'win' },
+      { match:'Real Sociedad vs Betis', tip:'Over 1.5 Goals',    odds:1.35, score:'2-2', res:'win' }
+    ],
+    threeOdds:[
+      { match:'Chelsea vs Fulham',      tip:'Chelsea to Win',    odds:1.65, score:'2-0', res:'win' },
+      { match:'Real Sociedad vs Betis', tip:'Over 1.5 Goals',    odds:1.35, score:'2-2', res:'win' },
+      { match:'Feyenoord vs AZ',        tip:'Feyenoord -1.5 AH', odds:1.80, score:'3-1', res:'win' }
+    ]
+  }
+];
+
+/* ============ HELPERS ============ */
+const fmtDate = d => d.toLocaleDateString('en-GB',{weekday:'short',day:'numeric',month:'short'});
+const winIcon  = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>';
+const lossIcon = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>';
+const slipWin  = legs => legs.every(l => l.res === 'win');
+const slipOdds = legs => legs.reduce((a,l) => a*l.odds, 1);
+
+/* ============ HOME ============ */
+function renderHome(){
+  document.getElementById('homeList').innerHTML = TODAY_TIPS.map((t,i) => `
+    <article class="tip">
+      <div class="tip-head">
+        <span class="tag">${t.league}</span>
+        <span class="time">${t.time}</span>
+      </div>
+      <h3 class="match">${t.match}</h3>
+      <div class="pick-row">
+        <span class="pick">${t.tip}</span>
+        <span class="odds">${t.odds.toFixed(2)}</span>
+      </div>
+      <div class="conf"><i style="width:${t.conf}%"></i></div>
+      <div class="conf-meta"><span>Tip ${i+1} of 3 · ${t.conf}% confidence</span><span>Single · 1u</span></div>
+    </article>
+  `).join('');
+}
+
+/* ============ RESULTS ============ */
+let currentCat = 'free';
+
+function renderResults(){
+  const totals = {
+    free:{ legs:0, wins:0 },
+    twoOdds:{ slips:0, wins:0 },
+    threeOdds:{ slips:0, wins:0 }
+  };
+  RESULTS.forEach(day => {
+    day.free.forEach(l => { totals.free.legs++; if (l.res==='win') totals.free.wins++; });
+    totals.twoOdds.slips++; if (slipWin(day.twoOdds)) totals.twoOdds.wins++;
+    totals.threeOdds.slips++; if (slipWin(day.threeOdds)) totals.threeOdds.wins++;
+  });
+
+  let statHTML = '';
+  if (currentCat === 'free'){
+    const rate = totals.free.legs ? Math.round((totals.free.wins/totals.free.legs)*100) : 0;
+    statHTML = `
+      <div class="stat"><b>${totals.free.wins}/${totals.free.legs}</b><span>7-day record</span></div>
+      <div class="stat"><b>${rate}%</b><span>Win rate</span></div>
+      <div class="stat"><b>3</b><span>Singles / day</span></div>
+    `;
+  } else {
+    const t = totals[currentCat];
+    const rate = t.slips ? Math.round((t.wins/t.slips)*100) : 0;
+    statHTML = `
+      <div class="stat"><b>${t.wins}/${t.slips}</b><span>Slips won</span></div>
+      <div class="stat"><b>${rate}%</b><span>Hit rate</span></div>
+      <div class="stat"><b>${currentCat==='twoOdds'?'2':'3'}</b><span>Legs / slip</span></div>
+    `;
+  }
+  document.getElementById('stats').innerHTML = statHTML;
+
+  const slider = document.getElementById('resSlider');
+  const dots   = document.getElementById('resDots');
+  slider.scrollLeft = 0;
+
+  const cardsHTML = RESULTS.map(day => {
+    const d = new Date(); d.setDate(d.getDate() - day.offset);
+    const dateStr = fmtDate(d);
+
+    if (currentCat === 'free'){
+      const wins = day.free.filter(l => l.res==='win').length;
+      const badgeClass = wins === day.free.length ? 'win' : wins === 0 ? 'loss' : 'mixed';
+      const legs = day.free.map(l => `
+        <div class="leg">
+          <div class="leg-info">
+            <div class="lm">${l.match}</div>
+            <div class="lt">${l.tip} · ${l.odds.toFixed(2)}</div>
+          </div>
+          <span class="pill ${l.res}">${l.res==='win'?winIcon:lossIcon}${l.score}</span>
+        </div>
+      `).join('');
+      return `
+        <div class="day">
+          <div class="day-head">
+            <span class="day-date">${dateStr}</span>
+            <span class="badge ${badgeClass}">${wins}/${day.free.length} won</span>
+          </div>
+          ${legs}
+        </div>`;
+    }
+
+    const legs = day[currentCat];
+    const won = slipWin(legs);
+    const total = slipOdds(legs);
+    const legsHTML = legs.map(l => `
+      <div class="leg">
+        <div class="leg-info">
+          <div class="lm">${l.match}</div>
+          <div class="lt">${l.tip} · ${l.odds.toFixed(2)}</div>
+        </div>
+        <span class="pill ${l.res}">${l.res==='win'?winIcon:lossIcon}${l.score}</span>
+      </div>
+    `).join('');
+    return `
+      <div class="day">
+        <div class="day-head">
+          <span class="day-date">${dateStr}</span>
+          <span class="badge ${won?'win':'loss'}">${won?'Won':'Lost'}</span>
+        </div>
+        ${legsHTML}
+        <div class="slip-total"><span>Combined odds</span><b>${total.toFixed(2)}</b></div>
+      </div>`;
+  }).join('');
+
+  slider.innerHTML = cardsHTML;
+  dots.innerHTML = RESULTS.map((_,i) => `<span class="dot${i===0?' active':''}"></span>`).join('');
+}
+
+/* scroll sync for results slider */
+const resSlider = document.getElementById('resSlider');
+resSlider.addEventListener('scroll', () => {
+  const idx = Math.round(resSlider.scrollLeft / (resSlider.clientWidth + 12));
+  document.querySelectorAll('#resDots .dot').forEach((d,i) => d.classList.toggle('active', i === idx));
+});
+
+document.getElementById('resTabs').addEventListener('click', e => {
+  const btn = e.target.closest('button[data-cat]');
+  if (!btn) return;
+  currentCat = btn.dataset.cat;
+  document.querySelectorAll('#resTabs button').forEach(b => b.classList.toggle('active', b === btn));
+  renderResults();
+  haptic('select');
+});
+
+/* ============ NAV ============ */
+const scroller = document.getElementById('scroller');
+function showView(name){
+  document.querySelectorAll('.view').forEach(v => v.classList.toggle('active', v.id === 'view-'+name));
+  document.querySelectorAll('.nav-item').forEach(b => b.classList.toggle('active', b.dataset.view === name));
+  scroller.scrollTop = 0;
+  haptic('light');
+}
+document.querySelectorAll('.nav-item').forEach(btn => {
+  btn.addEventListener('click', () => showView(btn.dataset.view));
+});
+
+/* ============ LINKS ============ */
+function openLink(url){
+  try {
+    if (tg?.openTelegramLink && url.includes('t.me')) tg.openTelegramLink(url);
+    else window.open(url, '_blank');
+    haptic('medium');
+  } catch(e){ window.open(url, '_blank'); }
+}
+function openPremium(){ openLink(PREMIUM_LINK); }
+function openChat(){ openLink(CHAT_LINK); }
+
+/* ============ INFO MODAL ============ */
+const infoOverlay = document.getElementById('infoOverlay');
+function openInfo(){ infoOverlay.classList.add('open'); haptic('light'); }
+function closeInfo(){ infoOverlay.classList.remove('open'); haptic('light'); }
+function handleInfoBackdrop(e){ if (e.target === infoOverlay) closeInfo(); }
+
+/* ============ INIT ============ */
+renderHome();
+renderResults();
+</script>
+</body>
+</html>
