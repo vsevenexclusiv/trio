@@ -160,24 +160,40 @@
   .stat b{display:block;font-family:var(--font-display);font-size:26px;font-weight:900;letter-spacing:0.3px;color:var(--accent);line-height:1;}
   .stat span{display:block;font-size:10.5px;font-weight:700;color:var(--muted);margin-top:6px;letter-spacing:0.3px;text-transform:uppercase;}
 
-  /* ============ RESULTS SLIDER ============ */
+  /* ============ FANCY RESULTS SLIDER ============ */
   .res-slider{
     display:flex;overflow-x:auto;scroll-snap-type:x mandatory;
-    scrollbar-width:none;gap:12px;padding-bottom:4px;
+    scrollbar-width:none;gap:12px;padding-bottom:20px; /* Extra padding for scale */
     -webkit-overflow-scrolling:touch;
+    padding-left: 2px; /* Prevents box-shadow clipping */
+    padding-right: 2px;
   }
   .res-slider::-webkit-scrollbar{display:none;}
+  
   .res-slider .day{
     flex:0 0 calc(100% - 24px);
-    scroll-snap-align:start;
+    scroll-snap-align: center; /* Center snap for the fancy effect */
     background:var(--surface);
     backdrop-filter:blur(24px) saturate(180%);
     -webkit-backdrop-filter:blur(24px) saturate(180%);
     border:1px solid rgba(255,255,255,0.95);border-radius:var(--radius);
     padding:16px 18px;
     box-shadow:0 6px 20px rgba(15,23,42,0.06);
+    /* Fancy transition base */
+    transition: transform 0.4s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.4s ease, box-shadow 0.4s ease;
+    opacity: 0.45;
+    transform: scale(0.92);
   }
-  .res-dots{display:flex;justify-content:center;gap:6px;margin:16px 0 18px;}
+
+  /* The Fancy Active State */
+  .res-slider .day.active-slide {
+    opacity: 1;
+    transform: scale(1);
+    box-shadow: 0 12px 32px rgba(255,95,46,0.15); /* Soft orange glow */
+    border-color: rgba(255,95,46,0.3);
+  }
+
+  .res-dots{display:flex;justify-content:center;gap:6px;margin:4px 0 18px;}
   .res-dots .dot{
     width:6px;height:6px;border-radius:50%;
     background:rgba(15,23,42,0.18);transition:all .25s ease;
@@ -312,7 +328,6 @@
     letter-spacing: 0.1px;
   }
   
-  /* ORANGE ACTIVE STATE */
   .nav-item.active{
     background: var(--accent-soft);
     color: var(--accent);
@@ -471,7 +486,7 @@
       
       <div class="feature">
         <div class="f-icon" style="background:var(--surface-2); color:var(--muted);"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg></div>
-        <div><b>App Version</b><span>Trio v2.0 (GH Pages)</span></div>
+        <div><b>App Version</b><span>Trio v2.1 (GH Pages)</span></div>
       </div>
     </div>
 
@@ -488,32 +503,22 @@
 
 </main>
 
-<!-- FLOATING BOTTOM NAV WITH 4 ITEMS -->
 <nav class="bottomnav">
   <div class="bottomnav-inner">
     <button class="nav-item active" data-view="home">
-      <svg viewBox="0 0 24 24">
-        <path d="M3 10.5L12 3l9 7.5V20a2 2 0 01-2 2h-4v-7h-6v7H5a2 2 0 01-2-2v-9.5z"/>
-      </svg>
+      <svg viewBox="0 0 24 24"><path d="M3 10.5L12 3l9 7.5V20a2 2 0 01-2 2h-4v-7h-6v7H5a2 2 0 01-2-2v-9.5z"/></svg>
       <span>Home</span>
     </button>
     <button class="nav-item" data-view="results">
-      <svg viewBox="0 0 24 24">
-        <path d="M3 20.5h18"/><path d="M6.5 20.5V14M12 20.5V7.5M17.5 20.5v-9"/>
-      </svg>
+      <svg viewBox="0 0 24 24"><path d="M3 20.5h18"/><path d="M6.5 20.5V14M12 20.5V7.5M17.5 20.5v-9"/></svg>
       <span>Results</span>
     </button>
     <button class="nav-item" data-view="premium">
-      <svg viewBox="0 0 24 24">
-        <path d="M3 8l4.2 3.2L12 4.5l4.8 6.7L21 8l-1.7 10H4.7L3 8z"/><path d="M4.7 21h14.6"/>
-      </svg>
+      <svg viewBox="0 0 24 24"><path d="M3 8l4.2 3.2L12 4.5l4.8 6.7L21 8l-1.7 10H4.7L3 8z"/><path d="M4.7 21h14.6"/></svg>
       <span>Premium</span>
     </button>
     <button class="nav-item" data-view="settings">
-      <svg viewBox="0 0 24 24">
-        <circle cx="12" cy="12" r="3"></circle>
-        <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
-      </svg>
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
       <span>Settings</span>
     </button>
   </div>
@@ -551,7 +556,7 @@ const haptic = (type = 'light') => {
 };
 
 /* ============================================================
-   CONFIG — update these to your real Telegram links
+   CONFIG
    ============================================================ */
 const PREMIUM_LINK = 'https://t.me/dailycompounderbot';
 const CHAT_LINK    = 'https://t.me/dailycompounderbot';
@@ -704,8 +709,11 @@ function renderHome(){
   `).join('');
 }
 
-/* ============ RESULTS ============ */
+/* ============ RESULTS & AUTO-SLIDER LOGIC ============ */
 let currentCat = 'free';
+let autoSlideTimer = null;
+let resumeTimer = null;
+const SLIDE_INTERVAL = 3500;
 
 function renderResults(){
   const totals = {
@@ -740,11 +748,14 @@ function renderResults(){
 
   const slider = document.getElementById('resSlider');
   const dots   = document.getElementById('resDots');
+  
+  // Fancy reset - remove old active states
   slider.scrollLeft = 0;
 
-  const cardsHTML = RESULTS.map(day => {
+  const cardsHTML = RESULTS.map((day, index) => {
     const d = new Date(); d.setDate(d.getDate() - day.offset);
     const dateStr = fmtDate(d);
+    const activeClass = index === 0 ? 'active-slide' : '';
 
     if (currentCat === 'free'){
       const wins = day.free.filter(l => l.res==='win').length;
@@ -759,7 +770,7 @@ function renderResults(){
         </div>
       `).join('');
       return `
-        <div class="day">
+        <div class="day ${activeClass}">
           <div class="day-head">
             <span class="day-date">${dateStr}</span>
             <span class="badge ${badgeClass}">${wins}/${day.free.length} won</span>
@@ -781,7 +792,7 @@ function renderResults(){
       </div>
     `).join('');
     return `
-      <div class="day">
+      <div class="day ${activeClass}">
         <div class="day-head">
           <span class="day-date">${dateStr}</span>
           <span class="badge ${won?'win':'loss'}">${won?'Won':'Lost'}</span>
@@ -793,15 +804,72 @@ function renderResults(){
 
   slider.innerHTML = cardsHTML;
   dots.innerHTML = RESULTS.map((_,i) => `<span class="dot${i===0?' active':''}"></span>`).join('');
+  
+  // Restart AutoSlide on render
+  stopAutoSlide();
+  startAutoSlide();
 }
 
-/* scroll sync for results slider */
+/* --- Auto-slide Magic --- */
+function startAutoSlide() {
+  if (autoSlideTimer) clearInterval(autoSlideTimer);
+  autoSlideTimer = setInterval(() => {
+    const slider = document.getElementById('resSlider');
+    const cards = slider.querySelectorAll('.day');
+    if (cards.length === 0) return;
+
+    const cardWidth = cards[0].offsetWidth + 12; // width + gap
+    let nextScroll = slider.scrollLeft + cardWidth;
+
+    // If we are at the end, snap back to the beginning
+    if (nextScroll >= slider.scrollWidth - slider.clientWidth - 10) {
+      nextScroll = 0;
+    }
+    
+    slider.scrollTo({ left: nextScroll, behavior: 'smooth' });
+  }, SLIDE_INTERVAL);
+}
+
+function stopAutoSlide() {
+  if (autoSlideTimer) clearInterval(autoSlideTimer);
+  if (resumeTimer) clearTimeout(resumeTimer);
+}
+
+function pauseAndResume() {
+  stopAutoSlide();
+  resumeTimer = setTimeout(() => {
+    startAutoSlide();
+  }, 6000); // Resume 6 seconds after user stops swiping
+}
+
+// Listen for scroll to update dots AND fancy scale effect
 const resSlider = document.getElementById('resSlider');
 resSlider.addEventListener('scroll', () => {
-  const idx = Math.round(resSlider.scrollLeft / (resSlider.clientWidth + 12));
+  const cards = resSlider.querySelectorAll('.day');
+  if (cards.length === 0) return;
+  
+  const cardWidth = cards[0].offsetWidth + 12; // width + gap
+  const idx = Math.round(resSlider.scrollLeft / cardWidth);
+  
+  // Update dots
   document.querySelectorAll('#resDots .dot').forEach((d,i) => d.classList.toggle('active', i === idx));
+  
+  // Apply fancy active class
+  cards.forEach((card, i) => {
+    if (i === idx) {
+      card.classList.add('active-slide');
+    } else {
+      card.classList.remove('active-slide');
+    }
+  });
 });
 
+// Pause auto-slide when user interacts
+resSlider.addEventListener('touchstart', pauseAndResume, { passive: true });
+resSlider.addEventListener('mousedown', pauseAndResume);
+resSlider.addEventListener('wheel', pauseAndResume, { passive: true });
+
+// Tab switching
 document.getElementById('resTabs').addEventListener('click', e => {
   const btn = e.target.closest('button[data-cat]');
   if (!btn) return;
@@ -818,6 +886,13 @@ function showView(name){
   document.querySelectorAll('.nav-item').forEach(b => b.classList.toggle('active', b.dataset.view === name));
   scroller.scrollTop = 0;
   haptic('light');
+  
+  // Pause auto-slide if we leave the results tab
+  if (name !== 'results') {
+    stopAutoSlide();
+  } else {
+    pauseAndResume();
+  }
 }
 document.querySelectorAll('.nav-item').forEach(btn => {
   btn.addEventListener('click', () => showView(btn.dataset.view));
